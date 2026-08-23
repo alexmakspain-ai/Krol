@@ -3,6 +3,7 @@ databases:
     databaseName: expense_tracker
     user: expense_tracker
     plan: free
+    region: oregon
 
 services:
   - type: web
@@ -11,6 +12,7 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     plan: free
+    region: oregon
     envVars:
       - key: DATABASE_URL
         fromDatabase:
