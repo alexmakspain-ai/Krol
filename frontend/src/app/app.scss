@@ -11,6 +11,12 @@
   font-size: 1.1rem;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .user-info {
   display: flex;
   align-items: center;

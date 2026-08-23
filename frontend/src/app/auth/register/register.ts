@@ -4,11 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { ApiErrorResponse } from '../../shared/api-error.model';
+import { TranslatePipe } from '../../shared/i18n/translate.pipe';
+import { TranslateService } from '../../shared/i18n/translate.service';
 import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })
@@ -16,6 +18,7 @@ export class Register {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -39,7 +42,8 @@ export class Register {
       error: (err: HttpErrorResponse) => {
         this.submitting.set(false);
         this.errorMessage.set(
-          (err.error as ApiErrorResponse)?.detail ?? 'Не удалось зарегистрироваться',
+          (err.error as ApiErrorResponse)?.detail ??
+            this.translateService.translate('auth.register.genericError'),
         );
       },
     });

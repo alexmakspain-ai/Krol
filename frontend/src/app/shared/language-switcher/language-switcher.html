@@ -1,0 +1,11 @@
+<div class="language-switcher">
+  @for (locale of locales; track locale) {
+    <button
+      type="button"
+      [class.active]="translateService.locale() === locale"
+      (click)="select(locale)"
+    >
+      {{ localeLabels[locale] }}
+    </button>
+  }
+</div>

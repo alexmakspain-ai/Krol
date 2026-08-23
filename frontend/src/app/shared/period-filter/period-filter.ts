@@ -1,11 +1,12 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
+import { TranslatePipe } from '../i18n/translate.pipe';
 import { PeriodPreset } from '../period';
 
 @Component({
   selector: 'app-period-filter',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './period-filter.html',
   styleUrl: './period-filter.scss',
 })

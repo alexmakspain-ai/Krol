@@ -1,36 +1,36 @@
 <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="expense-form">
-  <h2>Добавить расход</h2>
+  <h2>{{ 'expenseForm.heading' | translate }}</h2>
 
   <div class="fields">
     <div class="field">
       <label>
-        Название
+        {{ 'expenseForm.titleLabel' | translate }}
         <input type="text" formControlName="title" />
       </label>
       @if (form.controls.title.invalid && form.controls.title.touched) {
-        <p class="field-error">Введите название</p>
+        <p class="field-error">{{ 'expenseForm.titleError' | translate }}</p>
       }
     </div>
 
     <div class="field">
       <label>
-        Сумма
+        {{ 'expenseForm.amountLabel' | translate }}
         <input type="number" step="0.01" min="0.01" formControlName="amount" />
       </label>
       @if (form.controls.amount.invalid && form.controls.amount.touched) {
-        <p class="field-error">Сумма должна быть больше 0</p>
+        <p class="field-error">{{ 'expenseForm.amountError' | translate }}</p>
       }
     </div>
 
     <div class="field">
       <label>
-        Дата
+        {{ 'expenseForm.dateLabel' | translate }}
         <input type="date" formControlName="date" />
       </label>
     </div>
 
     <div class="field">
-      <label>Категория</label>
+      <label>{{ 'expenseForm.categoryLabel' | translate }}</label>
       <app-category-picker
         [categories]="categories()"
         [selectedId]="selectedCategoryId()"
@@ -39,7 +39,7 @@
         (categoryDeleted)="onCategoryDeleted($event)"
       />
       @if (categoryTouched() && selectedCategoryId() === null) {
-        <p class="field-error">Выберите категорию</p>
+        <p class="field-error">{{ 'expenseForm.categoryError' | translate }}</p>
       }
     </div>
   </div>
@@ -49,6 +49,8 @@
   }
 
   <button type="submit" [disabled]="submitting()">
-    {{ submitting() ? 'Добавляем…' : 'Добавить расход' }}
+    {{
+      submitting() ? ('expenseForm.submitting' | translate) : ('expenseForm.submit' | translate)
+    }}
   </button>
 </form>

@@ -46,3 +46,12 @@ export function presetRange(preset: PeriodPreset, custom: DateRange): DateRange 
       return custom;
   }
 }
+
+/** The full previous calendar month (e.g. run in August → July 1–31). */
+export function previousMonthRange(): DateRange {
+  const today = new Date();
+  const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  // Day 0 of the current month rolls back to the last day of the previous month.
+  const end = new Date(today.getFullYear(), today.getMonth(), 0);
+  return { start: isoDate(start), end: isoDate(end) };
+}

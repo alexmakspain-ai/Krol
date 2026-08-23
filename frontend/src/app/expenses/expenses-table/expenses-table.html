@@ -8,6 +8,15 @@
       (customStartChanged)="onCustomStartChanged($event)"
       (customEndChanged)="onCustomEndChanged($event)"
     />
+
+    <div class="export-actions">
+      <button type="button" [disabled]="exporting()" (click)="exportCsv()">
+        {{ 'expensesTable.exportCsv' | translate }}
+      </button>
+      <button type="button" [disabled]="exporting()" (click)="exportXlsx()">
+        {{ 'expensesTable.exportXlsx' | translate }}
+      </button>
+    </div>
   </div>
 
   @if (errorMessage()) {
@@ -18,25 +27,31 @@
     <thead>
       <tr>
         <th (click)="sortByField('title')">
-          Название
+          {{ 'expensesTable.colTitle' | translate }}
           @if (sortBy() === 'title') {
             <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
           }
         </th>
         <th (click)="sortByField('category')">
-          Категория
+          {{ 'expensesTable.colCategory' | translate }}
           @if (sortBy() === 'category') {
             <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
           }
         </th>
+        <th class="subcategory-header">
+          <button type="button" class="collapse-toggle" (click)="toggleSubcategoryColumn()">
+            {{ subcategoryColumnExpanded() ? '▾' : '▸' }}
+            {{ 'expensesTable.colSubcategory' | translate }}
+          </button>
+        </th>
         <th (click)="sortByField('amount')">
-          Сумма
+          {{ 'expensesTable.colAmount' | translate }}
           @if (sortBy() === 'amount') {
             <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
           }
         </th>
         <th (click)="sortByField('date')">
-          Дата
+          {{ 'expensesTable.colDate' | translate }}
           @if (sortBy() === 'date') {
             <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
           }
@@ -47,11 +62,11 @@
     <tbody>
       @if (loading()) {
         <tr>
-          <td colspan="5">Загрузка…</td>
+          <td colspan="6">{{ 'expensesTable.loading' | translate }}</td>
         </tr>
       } @else if (expenses().length === 0) {
         <tr>
-          <td colspan="5">Нет расходов за выбранный период</td>
+          <td colspan="6">{{ 'expensesTable.empty' | translate }}</td>
         </tr>
       } @else {
         @for (expense of expenses(); track expense.id) {
@@ -64,7 +79,7 @@
                   (ngModelChange)="editTitle.set($event)"
                 />
               </td>
-              <td>
+              <td colspan="2">
                 <app-category-picker
                   [categories]="categories()"
                   [selectedId]="editCategoryId()"
@@ -86,8 +101,12 @@
                 <input type="date" [ngModel]="editDate()" (ngModelChange)="editDate.set($event)" />
               </td>
               <td class="actions">
-                <button type="button" (click)="saveEdit(expense)">Сохранить</button>
-                <button type="button" (click)="cancelEdit()">Отмена</button>
+                <button type="button" (click)="saveEdit(expense)">
+                  {{ 'expensesTable.save' | translate }}
+                </button>
+                <button type="button" (click)="cancelEdit()">
+                  {{ 'expensesTable.cancel' | translate }}
+                </button>
               </td>
             </tr>
           } @else {
@@ -95,26 +114,62 @@
               <td>{{ expense.title }}</td>
               <td>
                 <span class="category-chip">
-                  <span class="color-dot" [style.background]="expense.category.color"></span>
-                  {{ expense.category.name }}
+                  <span class="color-dot" [style.background]="topCategoryOf(expense).color"></span>
+                  {{ topCategoryOf(expense).name }}
                 </span>
+              </td>
+              <td class="subcategory-cell" [class.collapsed]="!subcategoryColumnExpanded()">
+                @if (subcategoryColumnExpanded()) {
+                  {{ subcategoryLabelOf(expense) ?? ('expensesTable.noSubcategory' | translate) }}
+                } @else if (subcategoryLabelOf(expense)) {
+                  <span class="subcat-dot" [title]="subcategoryLabelOf(expense)"></span>
+                }
               </td>
               <td>{{ expense.amount | number: '1.2-2' }}</td>
               <td>{{ expense.date }}</td>
               <td class="actions">
-                <button type="button" (click)="startEdit(expense)">Изменить</button>
-                <button type="button" (click)="deleteExpense(expense)">Удалить</button>
+                <button type="button" (click)="startEdit(expense)">
+                  {{ 'expensesTable.edit' | translate }}
+                </button>
+                <button type="button" (click)="deleteExpense(expense)">
+                  {{ 'expensesTable.delete' | translate }}
+                </button>
               </td>
             </tr>
           }
         }
       }
     </tbody>
+    @if (categoryTotals().length > 0) {
+      <tfoot>
+        @for (total of categoryTotals(); track total.categoryId) {
+          <tr class="totals-row">
+            <td colspan="3">
+              <span class="category-chip">
+                <span class="color-dot" [style.background]="total.color"></span>
+                {{ total.name }}
+              </span>
+            </td>
+            <td>{{ total.total | number: '1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+        }
+        <tr class="totals-row grand-total">
+          <td colspan="3">{{ 'expensesTable.total' | translate }}</td>
+          <td>{{ grandTotal() | number: '1.2-2' }}</td>
+          <td colspan="2"></td>
+        </tr>
+      </tfoot>
+    }
   </table>
 
   <div class="pagination">
-    <button type="button" [disabled]="page() === 0" (click)="prevPage()">← Назад</button>
-    <span>Страница {{ page() + 1 }}</span>
-    <button type="button" [disabled]="!hasNextPage()" (click)="nextPage()">Вперёд →</button>
+    <button type="button" [disabled]="page() === 0" (click)="prevPage()">
+      {{ 'expensesTable.prevPage' | translate }}
+    </button>
+    <span>{{ 'expensesTable.page' | translate: { n: page() + 1 } }}</span>
+    <button type="button" [disabled]="!hasNextPage()" (click)="nextPage()">
+      {{ 'expensesTable.nextPage' | translate }}
+    </button>
   </div>
 </div>

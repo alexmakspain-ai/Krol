@@ -9,8 +9,10 @@ import {
   CategoryCreateRequest,
   Expense,
   ExpenseCreateRequest,
+  ExpenseSortField,
   ExpenseUpdateRequest,
   ExpensesQuery,
+  SortOrder,
 } from './models/expense.models';
 
 const MAX_PAGE_SIZE = 200;
@@ -74,5 +76,23 @@ export class ExpensesService {
       );
 
     return fetchPage(0);
+  }
+
+  exportExpenses(
+    format: 'csv' | 'xlsx',
+    range: DateRange,
+    sortBy: ExpenseSortField,
+    order: SortOrder,
+  ): Observable<Blob> {
+    const params = new HttpParams()
+      .set('start_date', range.start)
+      .set('end_date', range.end)
+      .set('sort_by', sortBy)
+      .set('order', order);
+
+    return this.http.get(`${API_BASE_URL}/expenses/export/${format}`, {
+      params,
+      responseType: 'blob',
+    });
   }
 }

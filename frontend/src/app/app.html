@@ -1,12 +1,16 @@
 <header class="app-header">
-  <span class="app-title">Expense Tracker</span>
+  <span class="app-title">{{ 'app.title' | translate }}</span>
 
-  @if (authService.isAuthenticated()) {
-    <div class="user-info">
-      <span>{{ authService.currentUserEmail() }}</span>
-      <button type="button" (click)="logout()">Выйти</button>
-    </div>
-  }
+  <div class="header-actions">
+    <app-language-switcher />
+
+    @if (authService.isAuthenticated()) {
+      <div class="user-info">
+        <span>{{ authService.currentUserEmail() }}</span>
+        <button type="button" (click)="logout()">{{ 'app.logout' | translate }}</button>
+      </div>
+    }
+  </div>
 </header>
 
 <router-outlet />

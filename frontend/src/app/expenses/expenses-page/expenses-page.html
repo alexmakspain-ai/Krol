@@ -8,9 +8,12 @@
     (categoryDeleted)="onCategoryDeleted($event)"
   />
 
-  <app-expenses-table
-    [categories]="categories()"
-    (categoryCreated)="onCategoryCreated($event)"
-    (categoryDeleted)="onCategoryDeleted($event)"
-  />
+  <div id="expenses-table-section">
+    <app-expenses-table
+      [categories]="categories()"
+      (categoryCreated)="onCategoryCreated($event)"
+      (categoryDeleted)="onCategoryDeleted($event)"
+      (expensesChanged)="onExpensesChanged()"
+    />
+  </div>
 </section>

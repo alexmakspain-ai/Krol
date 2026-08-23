@@ -12,6 +12,8 @@ import {
 import { FormsModule } from '@angular/forms';
 
 import { ApiErrorResponse } from '../../shared/api-error.model';
+import { TranslatePipe } from '../../shared/i18n/translate.pipe';
+import { TranslateService } from '../../shared/i18n/translate.service';
 import { ExpensesService } from '../expenses.service';
 import { Category } from '../models/expense.models';
 
@@ -24,13 +26,14 @@ interface CategoryNode {
 
 @Component({
   selector: 'app-category-picker',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './category-picker.html',
   styleUrl: './category-picker.scss',
 })
 export class CategoryPicker {
   private readonly expensesService = inject(ExpensesService);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
+  private readonly translateService = inject(TranslateService);
 
   readonly categories = input.required<Category[]>();
   readonly selectedId = input<number | null>(null);
@@ -115,7 +118,8 @@ export class CategoryPicker {
         },
         error: (err: HttpErrorResponse) => {
           this.errorMessage.set(
-            (err.error as ApiErrorResponse)?.detail ?? 'Не удалось создать категорию',
+            (err.error as ApiErrorResponse)?.detail ??
+              this.translateService.translate('categoryPicker.createError'),
           );
         },
       });
@@ -123,7 +127,9 @@ export class CategoryPicker {
 
   deleteCategory(category: Category, event: MouseEvent): void {
     event.stopPropagation();
-    if (!confirm(`Удалить категорию «${category.name}»?`)) {
+    if (
+      !confirm(this.translateService.translate('categoryPicker.deleteConfirm', { name: category.name }))
+    ) {
       return;
     }
 
@@ -132,7 +138,8 @@ export class CategoryPicker {
       next: () => this.categoryDeleted.emit(category.id),
       error: (err: HttpErrorResponse) => {
         this.errorMessage.set(
-          (err.error as ApiErrorResponse)?.detail ?? 'Не удалось удалить категорию',
+          (err.error as ApiErrorResponse)?.detail ??
+            this.translateService.translate('categoryPicker.deleteError'),
         );
       },
     });

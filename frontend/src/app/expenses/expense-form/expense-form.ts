@@ -3,6 +3,8 @@ import { Component, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ApiErrorResponse } from '../../shared/api-error.model';
+import { TranslatePipe } from '../../shared/i18n/translate.pipe';
+import { TranslateService } from '../../shared/i18n/translate.service';
 import { isoDate } from '../../shared/period';
 import { CategoryPicker } from '../category-picker/category-picker';
 import { ExpensesService } from '../expenses.service';
@@ -14,13 +16,14 @@ function todayIso(): string {
 
 @Component({
   selector: 'app-expense-form',
-  imports: [ReactiveFormsModule, CategoryPicker],
+  imports: [ReactiveFormsModule, CategoryPicker, TranslatePipe],
   templateUrl: './expense-form.html',
   styleUrl: './expense-form.scss',
 })
 export class ExpenseForm {
   private readonly fb = inject(FormBuilder);
   private readonly expensesService = inject(ExpensesService);
+  private readonly translateService = inject(TranslateService);
 
   readonly categories = input.required<Category[]>();
   readonly expenseAdded = output<Expense>();
@@ -73,7 +76,8 @@ export class ExpenseForm {
         error: (err: HttpErrorResponse) => {
           this.submitting.set(false);
           this.errorMessage.set(
-            (err.error as ApiErrorResponse)?.detail ?? 'Не удалось добавить расход',
+            (err.error as ApiErrorResponse)?.detail ??
+              this.translateService.translate('expenseForm.genericError'),
           );
         },
       });

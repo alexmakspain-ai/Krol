@@ -28,6 +28,10 @@ export class ExpensesPage implements OnInit {
     this.chart()?.reload();
   }
 
+  onExpensesChanged(): void {
+    this.chart()?.reload();
+  }
+
   onCategoryCreated(category: Category): void {
     this.categories.update((list) => [...list, category]);
   }

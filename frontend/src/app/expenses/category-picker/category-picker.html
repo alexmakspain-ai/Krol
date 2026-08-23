@@ -4,7 +4,7 @@
       <span class="color-dot" [style.background]="category.color"></span>
       <span>{{ category.name }}</span>
     } @else {
-      <span class="placeholder">Выберите категорию</span>
+      <span class="placeholder">{{ 'categoryPicker.placeholder' | translate }}</span>
     }
     <span class="chevron">▾</span>
   </button>
@@ -22,7 +22,7 @@
           <button
             type="button"
             class="row-action"
-            title="Добавить подкатегорию"
+            [title]="'categoryPicker.addSubcategory' | translate"
             (click)="$event.stopPropagation(); startCreate(node.category.id)"
           >
             +
@@ -30,7 +30,7 @@
           <button
             type="button"
             class="row-action delete"
-            title="Удалить категорию"
+            [title]="'categoryPicker.deleteCategory' | translate"
             (click)="deleteCategory(node.category, $event)"
           >
             🗑
@@ -41,13 +41,17 @@
           <div class="picker-create sub" (click)="$event.stopPropagation()">
             <input
               type="text"
-              placeholder="Название подкатегории"
+              [placeholder]="'categoryPicker.newSubcategoryPlaceholder' | translate"
               [ngModel]="newName()"
               (ngModelChange)="newName.set($event)"
             />
             <input type="color" [ngModel]="newColor()" (ngModelChange)="newColor.set($event)" />
-            <button type="button" (click)="confirmCreate()">Добавить</button>
-            <button type="button" (click)="cancelCreate()">Отмена</button>
+            <button type="button" (click)="confirmCreate()">
+              {{ 'categoryPicker.add' | translate }}
+            </button>
+            <button type="button" (click)="cancelCreate()">
+              {{ 'categoryPicker.cancel' | translate }}
+            </button>
           </div>
         }
 
@@ -58,7 +62,7 @@
             <button
               type="button"
               class="row-action delete"
-              title="Удалить категорию"
+              [title]="'categoryPicker.deleteCategory' | translate"
               (click)="deleteCategory(child, $event)"
             >
               🗑
@@ -71,17 +75,21 @@
         <div class="picker-create" (click)="$event.stopPropagation()">
           <input
             type="text"
-            placeholder="Название категории"
+            [placeholder]="'categoryPicker.newCategoryPlaceholder' | translate"
             [ngModel]="newName()"
             (ngModelChange)="newName.set($event)"
           />
           <input type="color" [ngModel]="newColor()" (ngModelChange)="newColor.set($event)" />
-          <button type="button" (click)="confirmCreate()">Добавить</button>
-          <button type="button" (click)="cancelCreate()">Отмена</button>
+          <button type="button" (click)="confirmCreate()">
+            {{ 'categoryPicker.add' | translate }}
+          </button>
+          <button type="button" (click)="cancelCreate()">
+            {{ 'categoryPicker.cancel' | translate }}
+          </button>
         </div>
       } @else {
         <div class="picker-row new-root" (click)="$event.stopPropagation(); startCreate('root')">
-          <span class="add-icon">+</span> Новая категория
+          <span class="add-icon">+</span> {{ 'categoryPicker.newCategory' | translate }}
         </div>
       }
     </div>

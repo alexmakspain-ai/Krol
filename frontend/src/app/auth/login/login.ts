@@ -4,11 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { ApiErrorResponse } from '../../shared/api-error.model';
+import { TranslatePipe } from '../../shared/i18n/translate.pipe';
+import { TranslateService } from '../../shared/i18n/translate.service';
 import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -17,6 +19,7 @@ export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly translateService = inject(TranslateService);
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -44,8 +47,9 @@ export class Login {
         this.submitting.set(false);
         this.errorMessage.set(
           err.status === 401
-            ? 'Неверный email или пароль'
-            : ((err.error as ApiErrorResponse)?.detail ?? 'Не удалось выполнить вход'),
+            ? this.translateService.translate('auth.login.wrongCredentials')
+            : ((err.error as ApiErrorResponse)?.detail ??
+                this.translateService.translate('auth.login.genericError')),
         );
       },
     });

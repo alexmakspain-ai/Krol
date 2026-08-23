@@ -1,21 +1,21 @@
 <div class="auth-card">
-  <h1>Вход</h1>
+  <h1>{{ 'auth.login.heading' | translate }}</h1>
 
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <label>
-      Email
+      {{ 'auth.login.emailLabel' | translate }}
       <input type="email" formControlName="email" autocomplete="email" />
     </label>
     @if (form.controls.email.invalid && form.controls.email.touched) {
-      <p class="field-error">Введите корректный email</p>
+      <p class="field-error">{{ 'auth.login.emailError' | translate }}</p>
     }
 
     <label>
-      Пароль
+      {{ 'auth.login.passwordLabel' | translate }}
       <input type="password" formControlName="password" autocomplete="current-password" />
     </label>
     @if (form.controls.password.invalid && form.controls.password.touched) {
-      <p class="field-error">Введите пароль</p>
+      <p class="field-error">{{ 'auth.login.passwordError' | translate }}</p>
     }
 
     @if (errorMessage()) {
@@ -23,9 +23,12 @@
     }
 
     <button type="submit" [disabled]="submitting()">
-      {{ submitting() ? 'Входим…' : 'Войти' }}
+      {{ submitting() ? ('auth.login.submitting' | translate) : ('auth.login.submit' | translate) }}
     </button>
   </form>
 
-  <p class="switch-link">Нет аккаунта? <a routerLink="/register">Зарегистрироваться</a></p>
+  <p class="switch-link">
+    {{ 'auth.login.noAccount' | translate }}
+    <a routerLink="/register">{{ 'auth.login.registerLink' | translate }}</a>
+  </p>
 </div>

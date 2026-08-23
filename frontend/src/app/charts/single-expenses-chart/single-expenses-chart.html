@@ -1,0 +1,77 @@
+<div class="single-chart">
+  <app-period-filter
+    [preset]="preset()"
+    [customStart]="customStart()"
+    [customEnd]="customEnd()"
+    (presetSelected)="onPresetSelected($event)"
+    (customStartChanged)="onCustomStartChanged($event)"
+    (customEndChanged)="onCustomEndChanged($event)"
+  />
+
+  @if (errorMessage()) {
+    <p class="form-error">{{ errorMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="status-text">{{ 'expensesChart.loading' | translate }}</p>
+  } @else if (totals().length === 0) {
+    <p class="status-text">{{ 'expensesChart.empty' | translate }}</p>
+  } @else {
+    <div class="chart-row">
+      <div class="chart-wrapper">
+        <canvas
+          baseChart
+          [data]="chartData()"
+          [type]="'doughnut'"
+          [options]="chartOptions"
+          (chartClick)="onChartClick($event)"
+        ></canvas>
+      </div>
+
+      <div class="info-panel">
+        @if (selectedCategory(); as category) {
+          <div class="info-scroll">
+            <div class="info-heading">
+              <span class="color-dot" [style.background]="category.color"></span>
+              <span class="info-name">{{ category.name }}</span>
+            </div>
+            <span class="info-amount">{{ category.total | number: '1.2-2' }}</span>
+            <span class="info-percent">{{ selectedPercentage() | number: '1.0-1' }}%</span>
+
+            @if (selectedBreakdown().length > 0) {
+              <ul class="breakdown-list">
+                @for (item of selectedBreakdown(); track item.categoryId) {
+                  <li>
+                    <span class="color-dot" [style.background]="item.color"></span>
+                    <span class="breakdown-name">{{ item.name }}</span>
+                    <span class="breakdown-amount">{{ item.total | number: '1.2-2' }}</span>
+                  </li>
+                }
+              </ul>
+            }
+
+            <button type="button" class="go-to-category" (click)="goToCategory()">
+              {{ 'expensesChart.goToCategory' | translate }}
+            </button>
+          </div>
+        } @else {
+          <div class="info-scroll info-total">
+            <span class="info-name">{{ 'expensesChart.totalForPeriod' | translate }}</span>
+            <span class="info-amount">{{ totalAmount() | number: '1.2-2' }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <ul class="legend">
+      @for (item of totals(); track item.categoryId; let i = $index) {
+        <li [class.active]="selectedIndex() === i" (click)="selectCategory(i)">
+          <span class="color-dot" [style.background]="item.color"></span>
+          {{ item.name }}
+        </li>
+      }
+    </ul>
+  }
+
+  <p class="period-label">{{ periodLabel() }}</p>
+</div>

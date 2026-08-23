@@ -6,6 +6,34 @@
 
 .toolbar {
   margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.export-actions {
+  display: flex;
+  gap: 0.5rem;
+
+  button {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.85rem;
+
+    &:hover:not(:disabled) {
+      background: #f5f5f5;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
 }
 
 table {
@@ -36,6 +64,51 @@ th {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+}
+
+.subcategory-header {
+  cursor: default;
+}
+
+.collapse-toggle {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: #333;
+}
+
+.subcategory-cell {
+  color: #555;
+
+  &.collapsed {
+    width: 1.5rem;
+    text-align: center;
+  }
+}
+
+.subcat-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #999;
+}
+
+.totals-row {
+  font-weight: 600;
+  background: #fafafa;
+
+  td {
+    border-top: 1px solid #ddd;
+    border-bottom: none;
+  }
+
+  &.grand-total {
+    border-top: 2px solid #ccc;
+  }
 }
 
 .color-dot {

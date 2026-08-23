@@ -370,3 +370,198 @@ README, где `backend/` и `frontend/` находятся на одном ур
   периода
 - `frontend/src/app/charts/expenses-chart/expenses-chart.scss` — стиль
   `.period-label`
+
+## Этап 6 — Экспорт в CSV/Excel
+
+### Backend
+
+**Изменено:**
+- `backend/app/routers/expenses.py`:
+  - добавлен `_build_expenses_query()` — вынесенная логика
+    фильтрации/сортировки, ранее inline в `list_expenses`; теперь
+    переиспользуется списком и экспортом
+  - `list_expenses` использует `_build_expenses_query()` + `.offset()/.limit()`
+  - добавлены `GET /expenses/export/csv` (`export_expenses_csv`) и
+    `GET /expenses/export/xlsx` (`export_expenses_xlsx`) — те же фильтры,
+    что у списка, без пагинации; возвращают `StreamingResponse` с
+    `Content-Disposition: attachment`
+  - CSV — модуль `csv` + `io.StringIO`, с префиксом UTF-8 BOM (`﻿`) для
+    корректного открытия кириллицы в Excel на Windows
+  - XLSX — `openpyxl.Workbook`, дата пишется как `datetime.date` (нативный
+    формат ячейки Excel)
+  - добавлена константа `EXPORT_HEADER = ["Название", "Категория", "Сумма",
+    "Дата"]` — общие заголовки колонок для обоих форматов
+
+### Frontend
+
+**Изменено:**
+- `frontend/src/app/expenses/expenses.service.ts` — добавлен
+  `exportExpenses(format, range, sortBy, order)` (`GET
+  /expenses/export/{format}`, `responseType: 'blob'`)
+- `frontend/src/app/expenses/expenses-table/expenses-table.ts` — добавлены
+  `exporting` signal, `exportCsv()`, `exportXlsx()`, приватный
+  `exportFile(format)` (скачивание через `URL.createObjectURL` +
+  синтетический `<a download>`, т.к. JWT передаётся заголовком и не
+  подставится при обычной навигации по `href`)
+- `frontend/src/app/expenses/expenses-table/expenses-table.html` — добавлен
+  блок `.export-actions` с кнопками «Экспорт в CSV»/«Экспорт в Excel» в
+  тулбаре, рядом с фильтром периода
+- `frontend/src/app/expenses/expenses-table/expenses-table.scss` — `.toolbar`
+  теперь flex-контейнер (period-filter + export-actions), добавлен стиль
+  `.export-actions`
+
+### Корень репозитория
+
+**Изменено:**
+- `README.md` — отмечен чекбокс «Экспорт в CSV/Excel»
+
+## Доработка после этапа 6 — авто-обновление диаграммы, разбивка по подкатегориям, мультиязык, итоги в таблице, колонка подкатегории
+
+Внеплановый запрос из 5 пунктов, не привязан к нумерации этапов ТЗ.
+Backend не менялся.
+
+### Общий рефакторинг
+
+**Создано:**
+- `frontend/src/app/expenses/category-aggregation.ts` — `CategoryTotal`,
+  `resolveTopCategory`, `aggregateByTopCategory`, `buildCategoriesById`
+  (вынесено из `expenses-chart.ts` для переиспользования таблицей)
+
+### Мультиязычность (RU/UK/EN)
+
+**Создано:**
+- `frontend/src/app/shared/i18n/locale.ts` — `Locale`, `LOCALES`,
+  `DEFAULT_LOCALE`, `LOCALE_LABELS`
+- `frontend/src/app/shared/i18n/translations.ts` — словари `ru`/`uk`/`en`,
+  тип `TranslationKey = keyof typeof ru`, `TRANSLATIONS`
+- `frontend/src/app/shared/i18n/translate.service.ts` — `TranslateService`
+  (сигнал текущей локали с персистом в `localStorage`, метод `translate(key,
+  params?)` с простой интерполяцией `{param}`)
+- `frontend/src/app/shared/i18n/translate.pipe.ts` — `TranslatePipe`
+  (`pure: false`)
+- `frontend/src/app/shared/language-switcher/language-switcher.ts`, `.html`,
+  `.scss` — переключатель RU/UA/EN
+
+**Изменено (переведены все пользовательские строки):**
+- `frontend/src/app/app.ts`, `.html`, `.scss` — заголовок, кнопка выхода,
+  `<app-language-switcher>` в хедере
+- `frontend/src/app/auth/login/login.ts`, `.html` — вся форма, ошибки
+- `frontend/src/app/auth/register/register.ts`, `.html` — вся форма, ошибки
+- `frontend/src/app/expenses/expense-form/expense-form.ts`, `.html` — вся
+  форма, ошибки
+- `frontend/src/app/expenses/category-picker/category-picker.ts`, `.html` —
+  плейсхолдеры, кнопки, подтверждение удаления с интерполяцией `{name}`
+- `frontend/src/app/shared/period-filter/period-filter.ts`, `.html` —
+  пресеты периода
+- `frontend/src/app/charts/expenses-chart/expenses-chart.ts`, `.html` —
+  заголовок, статусы, «Всего за период»
+- `frontend/src/app/expenses/expenses-table/expenses-table.ts`, `.html` —
+  заголовки колонок, кнопки, статусы, пагинация, подтверждение удаления с
+  интерполяцией `{title}`
+
+### Диаграмма — разбивка по подкатегориям при наведении (п. 2)
+
+**Изменено:**
+- `frontend/src/app/charts/expenses-chart/expenses-chart.ts`:
+  - добавлена `aggregateSubcategoryBreakdown()` — для каждой родительской
+    категории считает прямые расходы (label из
+    `expensesChart.noSubcategory`) + суммы по каждой подкатегории
+  - добавлен сигнал `subcategoryBreakdown` и computed `centerBreakdown`
+    (показывает разбивку только если у категории больше одной
+    составляющей — иначе она была бы избыточна)
+  - использует вынесенные `aggregateByTopCategory`/`buildCategoriesById` из
+    `category-aggregation.ts` вместо локальных копий
+- `frontend/src/app/charts/expenses-chart/expenses-chart.html` — блок
+  `<ul class="subcategory-breakdown">` под диаграммой, показывается когда
+  `centerBreakdown().length > 0`
+- `frontend/src/app/charts/expenses-chart/expenses-chart.scss` — стили
+  `.subcategory-breakdown`, `.breakdown-name`, `.breakdown-amount`
+
+### Таблица — авто-обновление диаграммы, итоги, колонка подкатегории (п. 1, 4, 5)
+
+**Изменено:**
+- `frontend/src/app/expenses/expenses-table/expenses-table.ts`:
+  - добавлен `expensesChanged = output<void>()`, эмитится после успешного
+    `saveEdit`/`deleteExpense` (п. 1)
+  - добавлены `categoryTotals` signal, `grandTotal` computed, приватный
+    `loadTotals()` (запрашивает `listAllExpenses` за весь период,
+    агрегирует через `aggregateByTopCategory`); вызывается при инициализации,
+    смене периода и после add/edit/delete (п. 4)
+  - добавлены `subcategoryColumnExpanded` signal,
+    `toggleSubcategoryColumn()`, `topCategoryOf(expense)`,
+    `subcategoryLabelOf(expense)` (п. 5)
+  - убраны локальные `isoDate`-совместимые функции агрегации — переиспользует
+    `category-aggregation.ts`
+- `frontend/src/app/expenses/expenses-table/expenses-table.html`:
+  - новая колонка «Подкатегория» между «Категория» и «Сумма», с
+    кнопкой-тогглом в заголовке (▸/▾); свёрнута по умолчанию (точка-индикатор
+    вместо текста); в режиме редактирования категория+подкатегория выбираются
+    одним `CategoryPicker` через `colspan="2"`
+  - `<tfoot>` со строками по каждой категории + строка «Итого»
+    (`grandTotal()`), показывается только когда есть данные
+  - `colspan` в пустых/loading-строках увеличен с 5 до 6 (новая колонка)
+- `frontend/src/app/expenses/expenses-table/expenses-table.scss` — стили
+  `.subcategory-header`, `.collapse-toggle`, `.subcategory-cell`,
+  `.subcat-dot`, `.totals-row`
+- `frontend/src/app/expenses/expenses-page/expenses-page.ts` — добавлен
+  `onExpensesChanged()` → `chart.reload()`
+- `frontend/src/app/expenses/expenses-page/expenses-page.html` — таблица
+  пробрасывает `(expensesChanged)="onExpensesChanged()"`
+
+## Доработка №2 — сравнение периодов, click вместо hover, фикс «прыжков», удаление RU
+
+Внеплановый запрос из 5 пунктов, не привязан к нумерации этапов ТЗ.
+Backend не менялся.
+
+### Мультиязычность — удаление RU
+
+**Изменено:**
+- `frontend/src/app/shared/i18n/locale.ts` — `Locale = 'uk' | 'en'` (было
+  `'ru' | 'uk' | 'en'`), `LOCALES`/`LOCALE_LABELS` без `ru`,
+  `DEFAULT_LOCALE` теперь `'en'` (была `'ru'`)
+- `frontend/src/app/shared/i18n/translations.ts` — словарь `ru` удалён;
+  `TranslationKey` теперь выводится из `en` (`keyof typeof en`); добавлены
+  ключи `expensesChart.goToCategory`, `expensesChart.showComparison`,
+  `expensesChart.hideComparison`, `expensesChart.comparisonHeading` (en/uk)
+- `frontend/src/app/shared/i18n/translate.service.ts` —
+  `readStoredLocale()` больше не распознаёт `'ru'` (откатится на
+  `DEFAULT_LOCALE`, если в `localStorage` осталось старое значение)
+
+### Диаграмма — рефакторинг + сравнение периодов + click-only + фикс layout (п. 1, 2, 4, 5)
+
+**Создано:**
+- `frontend/src/app/charts/single-expenses-chart/single-expenses-chart.ts`,
+  `.html`, `.scss` — `SingleExpensesChart`: вся логика одиночного графика,
+  вынесенная из старого `expenses-chart.ts` (period-filter, canvas,
+  агрегация, разбивка по подкатегориям) плюс:
+  - входы `initialPreset` (по умолчанию `'month'`) и `initialRange`
+    (опциональный точный диапазон, переопределяет `initialPreset`) —
+    задаются в `ngOnInit()`, не в field-инициализаторах (входы ещё не
+    привязаны на момент конструктора)
+  - `selectedIndex` вместо `hoveredIndex`/`selectedIndex`/`displayedIndex`
+    — `chartClick` теперь единственный триггер; `selectCategory()`
+    тоггл-логика (повторный клик снимает выбор)
+  - `goToCategory()` — `document.getElementById('expenses-table-section')
+    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })`
+  - layout: `.chart-row` (canvas + `.info-panel`, оба `height: 220px`),
+    текст рендерится в `.info-scroll` (`overflow-y: auto` внутри
+    фиксированной `.info-panel`) — легенда-сосед `.chart-row` больше не
+    сдвигается при изменении контента инфо-панели
+
+**Изменено:**
+- `frontend/src/app/charts/expenses-chart/expenses-chart.ts` — полностью
+  переписан: теперь внешний контейнер-виджет, рендерит
+  `<app-single-expenses-chart>` (основной, `#mainChart`) всегда и второй
+  (`#comparisonChart`, `[initialRange]="comparisonInitialRange"`) по
+  кнопке-тогглу `comparisonVisible`; `reload()` форвардит на оба
+  дочерних инстанса через `viewChild`
+- `frontend/src/app/charts/expenses-chart/expenses-chart.html` — шапка с
+  заголовком и кнопкой toggle; секция сравнения с собственным подзаголовком
+- `frontend/src/app/charts/expenses-chart/expenses-chart.scss` — layout
+  контейнера, `.comparison-toggle`, `.comparison-section`
+- `frontend/src/app/shared/period.ts` — добавлена `previousMonthRange()`
+  (полный предыдущий календарный месяц; `new Date(y, m, 0)` для последнего
+  дня предыдущего месяца — корректно на границах года)
+- `frontend/src/app/expenses/expenses-page/expenses-page.html` — обёртка
+  `<div id="expenses-table-section">` вокруг `<app-expenses-table>` —
+  якорь для прокрутки из «Go to category»

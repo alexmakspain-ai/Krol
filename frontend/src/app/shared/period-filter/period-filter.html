@@ -1,19 +1,19 @@
 <div class="period-filter">
   <button type="button" [class.active]="preset() === 'week'" (click)="presetSelected.emit('week')">
-    Неделя
+    {{ 'periodFilter.week' | translate }}
   </button>
   <button type="button" [class.active]="preset() === 'month'" (click)="presetSelected.emit('month')">
-    Месяц
+    {{ 'periodFilter.month' | translate }}
   </button>
   <button type="button" [class.active]="preset() === 'year'" (click)="presetSelected.emit('year')">
-    Год
+    {{ 'periodFilter.year' | translate }}
   </button>
   <button
     type="button"
     [class.active]="preset() === 'custom'"
     (click)="presetSelected.emit('custom')"
   >
-    Свой период
+    {{ 'periodFilter.custom' | translate }}
   </button>
 
   @if (preset() === 'custom') {
