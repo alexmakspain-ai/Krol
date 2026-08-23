@@ -1,11 +1,13 @@
 .expenses-table {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .toolbar {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -18,15 +20,21 @@
   gap: 0.5rem;
 
   button {
-    padding: 0.35rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #fff;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
 
     &:hover:not(:disabled) {
-      background: #f5f5f5;
+      background: var(--color-bg);
+      border-color: var(--color-text-muted);
     }
 
     &:disabled {
@@ -43,27 +51,40 @@ table {
 
 th,
 td {
-  padding: 0.6rem 0.5rem;
+  padding: 0.7rem 0.6rem;
   text-align: left;
-  border-bottom: 1px solid #eee;
-  font-size: 0.9rem;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.88rem;
 }
 
 th {
   cursor: pointer;
   user-select: none;
-  color: #333;
+  color: var(--color-text-muted);
   font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--color-border-strong);
 
   span {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+  }
+}
+
+tbody tr {
+  transition: background 0.12s ease;
+
+  &:hover {
+    background: var(--color-bg);
   }
 }
 
 .category-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
 .subcategory-header {
@@ -77,11 +98,14 @@ th {
   padding: 0;
   font: inherit;
   font-weight: 600;
-  color: #333;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
 }
 
 .subcategory-cell {
-  color: #555;
+  color: var(--color-text-secondary);
 
   &.collapsed {
     width: 1.5rem;
@@ -94,20 +118,21 @@ th {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #999;
+  background: var(--color-text-muted);
 }
 
 .totals-row {
   font-weight: 600;
-  background: #fafafa;
+  background: var(--color-bg);
 
   td {
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--color-border-strong);
     border-bottom: none;
   }
 
   &.grand-total {
-    border-top: 2px solid #ccc;
+    border-top: 2px solid var(--color-text-muted);
+    font-size: 0.95rem;
   }
 }
 
@@ -124,41 +149,70 @@ th {
   gap: 0.5rem;
 
   button {
-    padding: 0.3rem 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #fff;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
 
     &:hover {
-      background: #f5f5f5;
+      background: var(--color-bg);
+      border-color: var(--color-text-muted);
+    }
+
+    &.danger:hover {
+      background: var(--color-danger-bg);
+      border-color: var(--color-danger);
+      color: var(--color-danger);
     }
   }
 }
 
 .editing input,
 .editing select {
-  padding: 0.3rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
   width: 100%;
   box-sizing: border-box;
+  font-size: 0.85rem;
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
 }
 
 .pagination {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-top: 1rem;
-  font-size: 0.9rem;
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
 
   button {
-    padding: 0.35rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #fff;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-text);
     cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background: var(--color-bg);
+      border-color: var(--color-text-muted);
+    }
 
     &:disabled {
       opacity: 0.5;
@@ -168,6 +222,6 @@ th {
 }
 
 .form-error {
-  color: #d32f2f;
+  color: var(--color-danger);
   font-size: 0.85rem;
 }

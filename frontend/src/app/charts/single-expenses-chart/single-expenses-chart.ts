@@ -153,6 +153,14 @@ export class SingleExpensesChart implements OnInit {
     cutout: '68%',
     plugins: {
       legend: { display: false },
+      tooltip: {
+        backgroundColor: 'rgba(22, 24, 29, 0.92)',
+        padding: 10,
+        cornerRadius: 8,
+        boxPadding: 4,
+        titleFont: { family: 'Inter, system-ui, sans-serif', weight: 'bold' },
+        bodyFont: { family: 'Inter, system-ui, sans-serif' },
+      },
     },
   };
 
