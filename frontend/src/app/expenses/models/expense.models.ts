@@ -2,11 +2,13 @@ export interface Category {
   id: number;
   name: string;
   color: string;
+  parent_id: number | null;
 }
 
 export interface CategoryCreateRequest {
   name: string;
   color: string;
+  parent_id: number | null;
 }
 
 export interface Expense {

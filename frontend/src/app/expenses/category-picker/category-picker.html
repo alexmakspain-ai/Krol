@@ -1,0 +1,89 @@
+<div class="category-picker">
+  <button type="button" class="picker-toggle" (click)="toggle()">
+    @if (selectedCategory(); as category) {
+      <span class="color-dot" [style.background]="category.color"></span>
+      <span>{{ category.name }}</span>
+    } @else {
+      <span class="placeholder">Выберите категорию</span>
+    }
+    <span class="chevron">▾</span>
+  </button>
+
+  @if (open()) {
+    <div class="picker-panel">
+      @if (errorMessage()) {
+        <p class="picker-error">{{ errorMessage() }}</p>
+      }
+
+      @for (node of tree(); track node.category.id) {
+        <div class="picker-row" (click)="select(node.category.id)">
+          <span class="color-dot" [style.background]="node.category.color"></span>
+          <span class="row-name">{{ node.category.name }}</span>
+          <button
+            type="button"
+            class="row-action"
+            title="Добавить подкатегорию"
+            (click)="$event.stopPropagation(); startCreate(node.category.id)"
+          >
+            +
+          </button>
+          <button
+            type="button"
+            class="row-action delete"
+            title="Удалить категорию"
+            (click)="deleteCategory(node.category, $event)"
+          >
+            🗑
+          </button>
+        </div>
+
+        @if (creatingParentId() === node.category.id) {
+          <div class="picker-create sub" (click)="$event.stopPropagation()">
+            <input
+              type="text"
+              placeholder="Название подкатегории"
+              [ngModel]="newName()"
+              (ngModelChange)="newName.set($event)"
+            />
+            <input type="color" [ngModel]="newColor()" (ngModelChange)="newColor.set($event)" />
+            <button type="button" (click)="confirmCreate()">Добавить</button>
+            <button type="button" (click)="cancelCreate()">Отмена</button>
+          </div>
+        }
+
+        @for (child of node.children; track child.id) {
+          <div class="picker-row subcategory" (click)="select(child.id)">
+            <span class="color-dot" [style.background]="child.color"></span>
+            <span class="row-name">{{ child.name }}</span>
+            <button
+              type="button"
+              class="row-action delete"
+              title="Удалить категорию"
+              (click)="deleteCategory(child, $event)"
+            >
+              🗑
+            </button>
+          </div>
+        }
+      }
+
+      @if (creatingParentId() === 'root') {
+        <div class="picker-create" (click)="$event.stopPropagation()">
+          <input
+            type="text"
+            placeholder="Название категории"
+            [ngModel]="newName()"
+            (ngModelChange)="newName.set($event)"
+          />
+          <input type="color" [ngModel]="newColor()" (ngModelChange)="newColor.set($event)" />
+          <button type="button" (click)="confirmCreate()">Добавить</button>
+          <button type="button" (click)="cancelCreate()">Отмена</button>
+        </div>
+      } @else {
+        <div class="picker-row new-root" (click)="$event.stopPropagation(); startCreate('root')">
+          <span class="add-icon">+</span> Новая категория
+        </div>
+      }
+    </div>
+  }
+</div>

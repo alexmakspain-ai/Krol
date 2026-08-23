@@ -223,3 +223,150 @@ README, где `backend/` и `frontend/` находятся на одном ур
 
 **Изменено:**
 - `README.md` — отмечен чекбокс «Frontend: таблица расходов + добавление»
+
+## Этап 5 — Frontend: круговая диаграмма с фильтром по периоду
+
+### Общие модули (рефакторинг)
+
+**Создано:**
+- `frontend/src/app/shared/period.ts` — `PeriodPreset`, `DateRange`,
+  `isoDate`, `startOfWeek`, `startOfMonth`, `startOfYear`, `presetRange`
+  (вынесено из `expenses-table.ts`)
+- `frontend/src/app/shared/period-filter/period-filter.ts`, `.html`, `.scss`
+  — переиспользуемый `PeriodFilter`-компонент (кнопки пресетов + свой
+  диапазон дат)
+
+**Изменено:**
+- `frontend/src/app/expenses/expenses-table/expenses-table.ts` — убраны
+  локальные `isoDate`/`startOfWeek`/`startOfMonth`/`startOfYear`/`PeriodPreset`
+  и метод `range`, используется `presetRange` из `shared/period`; методы
+  `setPreset`/`applyCustomRange` заменены на `onPresetSelected`/
+  `onCustomStartChanged`/`onCustomEndChanged` под новый `PeriodFilter`
+- `frontend/src/app/expenses/expenses-table/expenses-table.html` — inline
+  разметка фильтра периода заменена на `<app-period-filter>`
+- `frontend/src/app/expenses/expenses-table/expenses-table.scss` — удалён
+  дублирующийся блок `.period-filter` (переехал в `period-filter.scss`)
+- `frontend/src/app/expenses/expenses.service.ts` — добавлен
+  `listAllExpenses(range)` (постраничный обход `GET /expenses`, лимит
+  200/запрос, до последней неполной страницы)
+- `frontend/src/app/expenses/expense-form/expense-form.ts` — `todayIso()`
+  теперь использует `isoDate()` из `shared/period` вместо собственной
+  реализации на `toISOString()`
+
+### Багфикс (обнаружен на этом этапе, затрагивает этап 4)
+
+**Изменено:**
+- `frontend/src/app/shared/period.ts` — `isoDate()` переписана: строит
+  `yyyy-mm-dd` из локальных `getFullYear/getMonth/getDate` вместо
+  `date.toISOString().slice(0, 10)`. Старая реализация конвертировала дату
+  в UTC перед форматированием, из-за чего `startOfWeek/Month/Year`
+  (строящие дату в локальном времени) систематически сдвигались на день
+  назад в часовых поясах восточнее UTC (подтверждено на UTC+2: «месяц»
+  начинался с 31 июля вместо 1 августа)
+
+### Диаграмма
+
+**Создано:**
+- `frontend/src/app/charts/expenses-chart/expenses-chart.ts`, `.html`,
+  `.scss` — кольцевая диаграмма (Chart.js/ng2-charts): агрегация расходов
+  по категориям, центр с названием/суммой/процентом выбранной или топ
+  категории (обновляется по hover/click), кастомная HTML-легенда,
+  независимый `PeriodFilter` (по умолчанию — месяц)
+
+**Изменено:**
+- `frontend/src/app/app.config.ts` — добавлен
+  `provideCharts(withDefaultRegisterables())` из `ng2-charts`
+- `frontend/src/app/expenses/expenses-page/expenses-page.ts` — добавлен
+  `viewChild(ExpensesChart)`, диаграмма перезагружается вместе с таблицей
+  по событию `expenseAdded`
+- `frontend/src/app/expenses/expenses-page/expenses-page.html` — добавлен
+  `<app-expenses-chart>` над формой и таблицей
+
+**Удалено:**
+- `frontend/src/app/charts/.gitkeep` (папка больше не пустая)
+
+### Корень репозитория
+
+**Изменено:**
+- `README.md` — отмечен чекбокс «Frontend: диаграмма с фильтром периода»
+
+## Доработка после этапа 5 — подкатегории, удаление категорий, доработки диаграммы
+
+Внеплановый запрос пользователя, не привязан к нумерации этапов ТЗ.
+
+### Backend — подкатегории
+
+**Изменено:**
+- `backend/app/models/category.py` — добавлен `parent_id` (self-referential
+  FK на `categories.id`, `ON DELETE CASCADE`), relationships `parent`/
+  `subcategories`
+- `backend/app/schemas/category.py` — `CategoryBase` получил поле
+  `parent_id: int | None`
+- `backend/app/routers/categories.py` — `_validate_parent()` (родитель
+  принадлежит пользователю, сам не подкатегория, не самоссылка на себя);
+  `create_category`/`update_category` используют её; сообщение 409 при
+  удалении уточнено (расходы у категории или её подкатегорий)
+- `backend/app/database.py` — добавлена `NAMING_CONVENTION` и передана в
+  `Base.metadata = MetaData(naming_convention=NAMING_CONVENTION)` — без неё
+  SQLAlchemy генерирует безымянные constraints, которые Alembic не может
+  обработать в SQLite batch-режиме
+- `backend/alembic/env.py` — добавлен `render_as_batch=True` в оба вызова
+  `context.configure(...)` — нужен, т.к. SQLite не поддерживает
+  `ALTER TABLE ADD/DROP CONSTRAINT` напрямую, только через пересборку
+  таблицы (batch mode)
+
+**Создано:**
+- `backend/alembic/versions/5226feb3527f_add_category_parent_id_for_subcategories.py`
+  — миграция: колонка `parent_id`, индекс, именованный FK
+  `fk_categories_parent_id_categories` (`ON DELETE CASCADE`)
+
+### Frontend — дропдаун категорий
+
+**Создано:**
+- `frontend/src/app/expenses/category-picker/category-picker.ts`, `.html`,
+  `.scss` — `CategoryPicker`: дерево категория/подкатегории, инлайн-создание
+  (в т.ч. подкатегории), удаление по клику на 🗑 (с подтверждением),
+  закрытие по клику вне (`@HostListener('document:click')`)
+
+**Изменено:**
+- `frontend/src/app/expenses/models/expense.models.ts` — `Category` и
+  `CategoryCreateRequest` получили поле `parent_id: number | null`
+- `frontend/src/app/expenses/expenses.service.ts` — добавлен
+  `deleteCategory(id)`
+- `frontend/src/app/expenses/expense-form/expense-form.ts` — убрана
+  реактивная логика `categoryId`/`newCategoryName`/`newCategoryColor` с
+  сентинелом `__new__`; вместо неё — `selectedCategoryId` signal и
+  `<app-category-picker>`, который сам управляет выбором/созданием/удалением
+- `frontend/src/app/expenses/expense-form/expense-form.html` — `<select>` +
+  поля новой категории заменены на `<app-category-picker>`
+- `frontend/src/app/expenses/expenses-table/expenses-table.ts` — добавлены
+  outputs `categoryCreated`/`categoryDeleted`, метод
+  `onCategoryDeletedInEdit()` (сбрасывает `editCategoryId`, если удалённая
+  категория была выбрана в строке редактирования)
+- `frontend/src/app/expenses/expenses-table/expenses-table.html` — `<select>`
+  в строке редактирования заменён на `<app-category-picker>`
+- `frontend/src/app/expenses/expenses-page/expenses-page.ts` — добавлен
+  `onCategoryDeleted()` (убирает категорию и её подкатегории из общего
+  списка)
+- `frontend/src/app/expenses/expenses-page/expenses-page.html` — форма и
+  таблица теперь пробрасывают `categoryCreated`/`categoryDeleted` в
+  `ExpensesPage`; диаграмма получает `[categories]`
+
+### Frontend — диаграмма
+
+**Изменено:**
+- `frontend/src/app/charts/expenses-chart/expenses-chart.ts`:
+  - добавлен `categories = input.required<Category[]>()` и
+    `categoriesById` computed
+  - `resolveTopCategory()`/`aggregateByCategory()` теперь сворачивают
+    подкатегории в родительскую категорию — на диаграмме только категории
+    верхнего уровня
+  - убран `topIndex` (дефолтный показ топ-категории в центре); `displayedIndex`
+    теперь `hoveredIndex() ?? selectedIndex()` без фолбэка на топ-категорию
+  - добавлен `periodLabel` computed (формат `ДД.ММ.ГГГГ – ДД.ММ.ГГГГ`)
+- `frontend/src/app/charts/expenses-chart/expenses-chart.html` — центр
+  диаграммы: при отсутствии наведения/выбора показывает «Всего за период» +
+  сумму (вместо топ-категории по умолчанию); под легендой добавлена подпись
+  периода
+- `frontend/src/app/charts/expenses-chart/expenses-chart.scss` — стиль
+  `.period-label`

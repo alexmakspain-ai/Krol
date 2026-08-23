@@ -1,9 +1,16 @@
 <section class="expenses-page">
+  <app-expenses-chart [categories]="categories()" />
+
   <app-expense-form
     [categories]="categories()"
     (expenseAdded)="onExpenseAdded()"
     (categoryCreated)="onCategoryCreated($event)"
+    (categoryDeleted)="onCategoryDeleted($event)"
   />
 
-  <app-expenses-table [categories]="categories()" />
+  <app-expenses-table
+    [categories]="categories()"
+    (categoryCreated)="onCategoryCreated($event)"
+    (categoryDeleted)="onCategoryDeleted($event)"
+  />
 </section>

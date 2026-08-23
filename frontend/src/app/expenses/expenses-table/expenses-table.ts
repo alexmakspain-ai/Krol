@@ -1,38 +1,20 @@
 import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { Component, OnInit, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ApiErrorResponse } from '../../shared/api-error.model';
+import { PeriodFilter } from '../../shared/period-filter/period-filter';
+import { PeriodPreset, isoDate, presetRange, startOfYear } from '../../shared/period';
+import { CategoryPicker } from '../category-picker/category-picker';
 import { ExpensesService } from '../expenses.service';
 import { Category, Expense, ExpenseSortField, ExpenseUpdateRequest, SortOrder } from '../models/expense.models';
 
-type PeriodPreset = 'week' | 'month' | 'year' | 'custom';
-
 const PAGE_SIZE = 10;
-
-function isoDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
-function startOfWeek(date: Date): Date {
-  const result = new Date(date);
-  const day = (result.getDay() + 6) % 7;
-  result.setDate(result.getDate() - day);
-  return result;
-}
-
-function startOfMonth(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
-}
-
-function startOfYear(date: Date): Date {
-  return new Date(date.getFullYear(), 0, 1);
-}
 
 @Component({
   selector: 'app-expenses-table',
-  imports: [FormsModule, DecimalPipe],
+  imports: [FormsModule, DecimalPipe, PeriodFilter, CategoryPicker],
   templateUrl: './expenses-table.html',
   styleUrl: './expenses-table.scss',
 })
@@ -40,6 +22,8 @@ export class ExpensesTable implements OnInit {
   private readonly expensesService = inject(ExpensesService);
 
   readonly categories = input.required<Category[]>();
+  readonly categoryCreated = output<Category>();
+  readonly categoryDeleted = output<number>();
 
   readonly preset = signal<PeriodPreset>('year');
   readonly customStart = signal(isoDate(startOfYear(new Date())));
@@ -60,20 +44,6 @@ export class ExpensesTable implements OnInit {
   readonly editDate = signal('');
   readonly editCategoryId = signal<number | null>(null);
 
-  private readonly range = computed<{ start: string; end: string }>(() => {
-    const today = new Date();
-    switch (this.preset()) {
-      case 'week':
-        return { start: isoDate(startOfWeek(today)), end: isoDate(today) };
-      case 'month':
-        return { start: isoDate(startOfMonth(today)), end: isoDate(today) };
-      case 'year':
-        return { start: isoDate(startOfYear(today)), end: isoDate(today) };
-      case 'custom':
-        return { start: this.customStart(), end: this.customEnd() };
-    }
-  });
-
   ngOnInit(): void {
     this.load();
   }
@@ -83,13 +53,21 @@ export class ExpensesTable implements OnInit {
     this.load();
   }
 
-  setPreset(preset: PeriodPreset): void {
+  onPresetSelected(preset: PeriodPreset): void {
     this.preset.set(preset);
     this.page.set(0);
     this.load();
   }
 
-  applyCustomRange(): void {
+  onCustomStartChanged(value: string): void {
+    this.customStart.set(value);
+    this.preset.set('custom');
+    this.page.set(0);
+    this.load();
+  }
+
+  onCustomEndChanged(value: string): void {
+    this.customEnd.set(value);
     this.preset.set('custom');
     this.page.set(0);
     this.load();
@@ -134,6 +112,13 @@ export class ExpensesTable implements OnInit {
     this.editingId.set(null);
   }
 
+  onCategoryDeletedInEdit(id: number): void {
+    if (this.editCategoryId() === id) {
+      this.editCategoryId.set(null);
+    }
+    this.categoryDeleted.emit(id);
+  }
+
   saveEdit(expense: Expense): void {
     const categoryId = this.editCategoryId();
     const amount = this.editAmount();
@@ -175,7 +160,7 @@ export class ExpensesTable implements OnInit {
   }
 
   private load(): void {
-    const { start, end } = this.range();
+    const { start, end } = presetRange(this.preset(), { start: this.customStart(), end: this.customEnd() });
     this.loading.set(true);
     this.errorMessage.set(null);
 

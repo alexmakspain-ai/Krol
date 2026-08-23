@@ -1,0 +1,60 @@
+<div class="expenses-chart">
+  <h2>Расходы по категориям</h2>
+
+  <app-period-filter
+    [preset]="preset()"
+    [customStart]="customStart()"
+    [customEnd]="customEnd()"
+    (presetSelected)="onPresetSelected($event)"
+    (customStartChanged)="onCustomStartChanged($event)"
+    (customEndChanged)="onCustomEndChanged($event)"
+  />
+
+  @if (errorMessage()) {
+    <p class="form-error">{{ errorMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="status-text">Загрузка…</p>
+  } @else if (totals().length === 0) {
+    <p class="status-text">Нет расходов за выбранный период</p>
+  } @else {
+    <div class="chart-wrapper">
+      <canvas
+        baseChart
+        [data]="chartData()"
+        [type]="'doughnut'"
+        [options]="chartOptions"
+        (chartHover)="onChartHover($event)"
+        (chartClick)="onChartClick($event)"
+      ></canvas>
+
+      <div class="chart-center">
+        @if (centerCategory(); as category) {
+          <span class="chart-center-name">{{ category.name }}</span>
+          <span class="chart-center-amount">{{ category.total | number: '1.2-2' }}</span>
+          <span class="chart-center-percent">{{ centerPercentage() | number: '1.0-1' }}%</span>
+        } @else {
+          <span class="chart-center-name">Всего за период</span>
+          <span class="chart-center-amount">{{ totalAmount() | number: '1.2-2' }}</span>
+        }
+      </div>
+    </div>
+
+    <ul class="legend">
+      @for (item of totals(); track item.categoryId; let i = $index) {
+        <li
+          [class.active]="displayedIndex() === i"
+          (click)="selectCategory(i)"
+          (mouseenter)="hoveredIndex.set(i)"
+          (mouseleave)="hoveredIndex.set(null)"
+        >
+          <span class="color-dot" [style.background]="item.color"></span>
+          {{ item.name }}
+        </li>
+      }
+    </ul>
+  }
+
+  <p class="period-label">{{ periodLabel() }}</p>
+</div>

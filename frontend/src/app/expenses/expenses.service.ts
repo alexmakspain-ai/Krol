@@ -1,7 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map, of, switchMap } from 'rxjs';
 
+import { DateRange } from '../shared/period';
 import { API_BASE_URL } from '../shared/api-config';
 import {
   Category,
@@ -11,6 +12,8 @@ import {
   ExpenseUpdateRequest,
   ExpensesQuery,
 } from './models/expense.models';
+
+const MAX_PAGE_SIZE = 200;
 
 @Injectable({ providedIn: 'root' })
 export class ExpensesService {
@@ -22,6 +25,10 @@ export class ExpensesService {
 
   createCategory(payload: CategoryCreateRequest): Observable<Category> {
     return this.http.post<Category>(`${API_BASE_URL}/categories`, payload);
+  }
+
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_BASE_URL}/categories/${id}`);
   }
 
   listExpenses(query: ExpensesQuery): Observable<Expense[]> {
@@ -44,5 +51,28 @@ export class ExpensesService {
 
   deleteExpense(id: number): Observable<void> {
     return this.http.delete<void>(`${API_BASE_URL}/expenses/${id}`);
+  }
+
+  /**
+   * Fetches every expense in the given date range by walking backend pages
+   * (capped at MAX_PAGE_SIZE per request) — used to aggregate totals for the
+   * chart widget, since the backend has no dedicated aggregation endpoint.
+   */
+  listAllExpenses(range: DateRange): Observable<Expense[]> {
+    const fetchPage = (skip: number): Observable<Expense[]> =>
+      this.listExpenses({
+        start_date: range.start,
+        end_date: range.end,
+        limit: MAX_PAGE_SIZE,
+        skip,
+      }).pipe(
+        switchMap((page) =>
+          page.length === MAX_PAGE_SIZE
+            ? fetchPage(skip + MAX_PAGE_SIZE).pipe(map((rest) => [...page, ...rest]))
+            : of(page),
+        ),
+      );
+
+    return fetchPage(0);
   }
 }

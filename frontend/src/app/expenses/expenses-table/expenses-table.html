@@ -1,37 +1,13 @@
 <div class="expenses-table">
   <div class="toolbar">
-    <div class="period-filter">
-      <button type="button" [class.active]="preset() === 'week'" (click)="setPreset('week')">
-        Неделя
-      </button>
-      <button type="button" [class.active]="preset() === 'month'" (click)="setPreset('month')">
-        Месяц
-      </button>
-      <button type="button" [class.active]="preset() === 'year'" (click)="setPreset('year')">
-        Год
-      </button>
-      <button
-        type="button"
-        [class.active]="preset() === 'custom'"
-        (click)="applyCustomRange()"
-      >
-        Свой период
-      </button>
-
-      @if (preset() === 'custom') {
-        <input
-          type="date"
-          [ngModel]="customStart()"
-          (ngModelChange)="customStart.set($event); applyCustomRange()"
-        />
-        <span>—</span>
-        <input
-          type="date"
-          [ngModel]="customEnd()"
-          (ngModelChange)="customEnd.set($event); applyCustomRange()"
-        />
-      }
-    </div>
+    <app-period-filter
+      [preset]="preset()"
+      [customStart]="customStart()"
+      [customEnd]="customEnd()"
+      (presetSelected)="onPresetSelected($event)"
+      (customStartChanged)="onCustomStartChanged($event)"
+      (customEndChanged)="onCustomEndChanged($event)"
+    />
   </div>
 
   @if (errorMessage()) {
@@ -89,14 +65,13 @@
                 />
               </td>
               <td>
-                <select
-                  [ngModel]="editCategoryId()"
-                  (ngModelChange)="editCategoryId.set($event)"
-                >
-                  @for (category of categories(); track category.id) {
-                    <option [ngValue]="category.id">{{ category.name }}</option>
-                  }
-                </select>
+                <app-category-picker
+                  [categories]="categories()"
+                  [selectedId]="editCategoryId()"
+                  (selected)="editCategoryId.set($event)"
+                  (categoryCreated)="categoryCreated.emit($event)"
+                  (categoryDeleted)="onCategoryDeletedInEdit($event)"
+                />
               </td>
               <td>
                 <input

@@ -19,6 +19,24 @@ def _get_owned_category(db: Session, user: User, category_id: int) -> Category:
     return category
 
 
+def _validate_parent(
+    db: Session, user: User, parent_id: int | None, category_id: int | None = None
+) -> None:
+    if parent_id is None:
+        return
+    if parent_id == category_id:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, "Категория не может быть подкатегорией самой себя"
+        )
+    parent = db.get(Category, parent_id)
+    if parent is None or parent.user_id != user.id:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Родительская категория не найдена")
+    if parent.parent_id is not None:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, "Подкатегория не может иметь свою подкатегорию"
+        )
+
+
 @router.get("", response_model=list[CategoryOut])
 def list_categories(
     db: Session = Depends(get_db), user: User = Depends(get_current_user)
@@ -36,7 +54,10 @@ def create_category(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> Category:
-    category = Category(user_id=user.id, name=payload.name, color=payload.color)
+    _validate_parent(db, user, payload.parent_id)
+    category = Category(
+        user_id=user.id, name=payload.name, color=payload.color, parent_id=payload.parent_id
+    )
     db.add(category)
     db.commit()
     db.refresh(category)
@@ -51,8 +72,10 @@ def update_category(
     user: User = Depends(get_current_user),
 ) -> Category:
     category = _get_owned_category(db, user, category_id)
+    _validate_parent(db, user, payload.parent_id, category_id)
     category.name = payload.name
     category.color = payload.color
+    category.parent_id = payload.parent_id
     db.commit()
     db.refresh(category)
     return category
@@ -71,5 +94,6 @@ def delete_category(
     except IntegrityError:
         db.rollback()
         raise HTTPException(
-            status.HTTP_409_CONFLICT, "Нельзя удалить категорию, у которой есть расходы"
+            status.HTTP_409_CONFLICT,
+            "Нельзя удалить категорию, у которой есть расходы (или расходы у подкатегорий)",
         )

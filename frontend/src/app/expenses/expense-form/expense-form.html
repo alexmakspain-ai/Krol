@@ -30,39 +30,18 @@
     </div>
 
     <div class="field">
-      <label>
-        Категория
-        <select formControlName="categoryId">
-          <option value="" disabled>Выберите категорию</option>
-          @for (category of categories(); track category.id) {
-            <option [value]="category.id">{{ category.name }}</option>
-          }
-          <option [value]="newCategoryValue">+ Новая категория</option>
-        </select>
-      </label>
-      @if (form.controls.categoryId.invalid && form.controls.categoryId.touched) {
+      <label>Категория</label>
+      <app-category-picker
+        [categories]="categories()"
+        [selectedId]="selectedCategoryId()"
+        (selected)="selectedCategoryId.set($event)"
+        (categoryCreated)="categoryCreated.emit($event)"
+        (categoryDeleted)="onCategoryDeleted($event)"
+      />
+      @if (categoryTouched() && selectedCategoryId() === null) {
         <p class="field-error">Выберите категорию</p>
       }
     </div>
-
-    @if (isNewCategory) {
-      <div class="field">
-        <label>
-          Название категории
-          <input type="text" formControlName="newCategoryName" />
-        </label>
-        @if (form.controls.newCategoryName.invalid && form.controls.newCategoryName.touched) {
-          <p class="field-error">Введите название категории</p>
-        }
-      </div>
-
-      <div class="field">
-        <label>
-          Цвет
-          <input type="color" formControlName="newCategoryColor" />
-        </label>
-      </div>
-    }
   </div>
 
   @if (errorMessage()) {
