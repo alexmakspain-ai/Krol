@@ -1,0 +1,145 @@
+<div class="expenses-table">
+  <div class="toolbar">
+    <div class="period-filter">
+      <button type="button" [class.active]="preset() === 'week'" (click)="setPreset('week')">
+        Неделя
+      </button>
+      <button type="button" [class.active]="preset() === 'month'" (click)="setPreset('month')">
+        Месяц
+      </button>
+      <button type="button" [class.active]="preset() === 'year'" (click)="setPreset('year')">
+        Год
+      </button>
+      <button
+        type="button"
+        [class.active]="preset() === 'custom'"
+        (click)="applyCustomRange()"
+      >
+        Свой период
+      </button>
+
+      @if (preset() === 'custom') {
+        <input
+          type="date"
+          [ngModel]="customStart()"
+          (ngModelChange)="customStart.set($event); applyCustomRange()"
+        />
+        <span>—</span>
+        <input
+          type="date"
+          [ngModel]="customEnd()"
+          (ngModelChange)="customEnd.set($event); applyCustomRange()"
+        />
+      }
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <p class="form-error">{{ errorMessage() }}</p>
+  }
+
+  <table>
+    <thead>
+      <tr>
+        <th (click)="sortByField('title')">
+          Название
+          @if (sortBy() === 'title') {
+            <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+          }
+        </th>
+        <th (click)="sortByField('category')">
+          Категория
+          @if (sortBy() === 'category') {
+            <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+          }
+        </th>
+        <th (click)="sortByField('amount')">
+          Сумма
+          @if (sortBy() === 'amount') {
+            <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+          }
+        </th>
+        <th (click)="sortByField('date')">
+          Дата
+          @if (sortBy() === 'date') {
+            <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+          }
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr>
+          <td colspan="5">Загрузка…</td>
+        </tr>
+      } @else if (expenses().length === 0) {
+        <tr>
+          <td colspan="5">Нет расходов за выбранный период</td>
+        </tr>
+      } @else {
+        @for (expense of expenses(); track expense.id) {
+          @if (editingId() === expense.id) {
+            <tr class="editing">
+              <td>
+                <input
+                  type="text"
+                  [ngModel]="editTitle()"
+                  (ngModelChange)="editTitle.set($event)"
+                />
+              </td>
+              <td>
+                <select
+                  [ngModel]="editCategoryId()"
+                  (ngModelChange)="editCategoryId.set($event)"
+                >
+                  @for (category of categories(); track category.id) {
+                    <option [ngValue]="category.id">{{ category.name }}</option>
+                  }
+                </select>
+              </td>
+              <td>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  [ngModel]="editAmount()"
+                  (ngModelChange)="editAmount.set($event)"
+                />
+              </td>
+              <td>
+                <input type="date" [ngModel]="editDate()" (ngModelChange)="editDate.set($event)" />
+              </td>
+              <td class="actions">
+                <button type="button" (click)="saveEdit(expense)">Сохранить</button>
+                <button type="button" (click)="cancelEdit()">Отмена</button>
+              </td>
+            </tr>
+          } @else {
+            <tr>
+              <td>{{ expense.title }}</td>
+              <td>
+                <span class="category-chip">
+                  <span class="color-dot" [style.background]="expense.category.color"></span>
+                  {{ expense.category.name }}
+                </span>
+              </td>
+              <td>{{ expense.amount | number: '1.2-2' }}</td>
+              <td>{{ expense.date }}</td>
+              <td class="actions">
+                <button type="button" (click)="startEdit(expense)">Изменить</button>
+                <button type="button" (click)="deleteExpense(expense)">Удалить</button>
+              </td>
+            </tr>
+          }
+        }
+      }
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <button type="button" [disabled]="page() === 0" (click)="prevPage()">← Назад</button>
+    <span>Страница {{ page() + 1 }}</span>
+    <button type="button" [disabled]="!hasNextPage()" (click)="nextPage()">Вперёд →</button>
+  </div>
+</div>

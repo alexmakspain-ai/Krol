@@ -1,0 +1,9 @@
+<section class="expenses-page">
+  <app-expense-form
+    [categories]="categories()"
+    (expenseAdded)="onExpenseAdded()"
+    (categoryCreated)="onCategoryCreated($event)"
+  />
+
+  <app-expenses-table [categories]="categories()" />
+</section>

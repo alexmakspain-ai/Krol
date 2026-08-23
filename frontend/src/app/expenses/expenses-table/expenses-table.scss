@@ -1,0 +1,128 @@
+.expenses-table {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.toolbar {
+  margin-bottom: 1rem;
+}
+
+.period-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+
+  button {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 999px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.85rem;
+
+    &.active {
+      background: #1a73e8;
+      color: #fff;
+      border-color: #1a73e8;
+    }
+  }
+
+  input[type='date'] {
+    padding: 0.3rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.6rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+th {
+  cursor: pointer;
+  user-select: none;
+  color: #333;
+  font-weight: 600;
+
+  span {
+    font-size: 0.75rem;
+  }
+}
+
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+
+  button {
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.8rem;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+}
+
+.editing input,
+.editing select {
+  padding: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+
+  button {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.form-error {
+  color: #d32f2f;
+  font-size: 0.85rem;
+}

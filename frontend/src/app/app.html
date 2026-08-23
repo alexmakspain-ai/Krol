@@ -1,6 +1,12 @@
-<main>
-  <h1>Expense Tracker</h1>
-  <p>Frontend инициализирован. Виджеты будут добавлены на следующих этапах.</p>
-</main>
+<header class="app-header">
+  <span class="app-title">Expense Tracker</span>
+
+  @if (authService.isAuthenticated()) {
+    <div class="user-info">
+      <span>{{ authService.currentUserEmail() }}</span>
+      <button type="button" (click)="logout()">Выйти</button>
+    </div>
+  }
+</header>
 
 <router-outlet />

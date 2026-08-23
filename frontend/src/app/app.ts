@@ -1,5 +1,7 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+
+import { AuthService } from './auth/auth.service';
 
 @Component({
   imports: [RouterOutlet],
@@ -8,5 +10,11 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.html',
 })
 export class App {
-  protected readonly title = signal('Expense Tracker');
+  protected readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigateByUrl('/login');
+  }
 }
