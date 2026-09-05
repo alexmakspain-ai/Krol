@@ -24,3 +24,5 @@ services:
         value: HS256
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "1440"
+      - key: CORS_ORIGINS
+        value: "https://krol-omega.vercel.app,https://krol-rd5ff7s5e-alexmakspain-ai.vercel.app,http://localhost:4200"
