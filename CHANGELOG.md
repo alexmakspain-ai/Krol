@@ -679,8 +679,7 @@ Backend не менялся.
 
 ## Доработка №5 — конфигурация сборки фронтенда для Vercel
 
-Внеплановый запрос, не привязан к нумерации этапов ТЗ. Backend не менялся
-(только запланирован один env var — см. «Не сделано» в PROGRESS.md).
+Внеплановый запрос, не привязан к нумерации этапов ТЗ.
 
 ### Frontend
 
@@ -697,3 +696,23 @@ Backend не менялся.
   (`projects.frontend.architect.build.configurations.vercel`), по образцу
   `production`, с `fileReplacements` на `environment.vercel.ts`;
   существующая `production` (используется `Dockerfile`) не тронута
+
+### Backend
+
+**Изменено:**
+- `render.yaml` — добавлен env var `CORS_ORIGINS` (два домена Vercel —
+  стабильный алиас проекта и фактический адрес конкретного деплоя — плюс
+  `http://localhost:4200`); `app/config.py` не менялся, `cors_origins_list`
+  уже умел парсить comma-separated список
+
+### Деплой (выполнено пользователем)
+
+- Репозиторий подключён к Vercel через GitHub App (потребовалась установка
+  приложения — по умолчанию доступа к репозиторию не было)
+  и `Root Directory = frontend` в Settings → Build and Deployment
+  (с первой попытки значение сохранилось с лишним пробелом — билд падал с
+  `Root Directory "frontend " does not exist`, чинится перевводом поля)
+- `CORS_ORIGINS` применён на Render вручную через Environment tab
+  (не через Blueprint-синк) — сервис передеплоился автоматически
+- Сквозной сценарий (открыть Vercel-домен → Sign up → Log in) проверен
+  пользователем вживую и работает
