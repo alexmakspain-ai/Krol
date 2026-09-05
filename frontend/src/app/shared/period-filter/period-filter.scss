@@ -6,10 +6,10 @@
 
   button {
     padding: 0.4rem 0.9rem;
-    border: 1px solid var(--color-border-strong);
+    border: 1px solid var(--input);
     border-radius: var(--radius-pill);
-    background: var(--color-surface);
-    color: var(--color-text-secondary);
+    background: var(--card);
+    color: var(--muted-foreground);
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 500;
@@ -19,28 +19,19 @@
       color 0.15s ease;
 
     &:hover:not(.active) {
-      background: var(--color-bg);
-      border-color: var(--color-text-muted);
+      background: var(--background);
+      border-color: var(--muted-foreground);
     }
 
     &.active {
-      background: var(--color-primary);
-      color: #fff;
-      border-color: var(--color-primary);
+      background: var(--primary);
+      color: var(--primary-foreground);
+      border-color: var(--primary);
     }
   }
 
   input[type='date'] {
     padding: 0.35rem 0.5rem;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-sm);
     font-size: 0.85rem;
-    color: var(--color-text);
-
-    &:focus-visible {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px var(--color-primary-light);
-    }
   }
 }

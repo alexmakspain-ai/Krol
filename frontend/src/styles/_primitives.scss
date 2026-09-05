@@ -1,0 +1,84 @@
+// Shared button primitive. Buttons that are really a segmented-control
+// pattern (period-filter presets, language-switcher) keep their own styling
+// on purpose — forcing them into .btn variants would make them worse.
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--primary-border);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn--sm {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+}
+
+.btn--block {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.7rem;
+}
+
+.btn--primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+
+  &:hover:not(:disabled) {
+    background: var(--primary-hover);
+  }
+}
+
+.btn--secondary {
+  background: var(--card);
+  border-color: var(--input);
+  color: var(--foreground);
+
+  &:hover:not(:disabled) {
+    background: var(--secondary);
+    border-color: var(--muted-foreground);
+  }
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--input);
+  color: var(--foreground);
+
+  &:hover:not(:disabled) {
+    background: var(--accent);
+  }
+}
+
+.btn--destructive {
+  background: var(--card);
+  border-color: var(--input);
+  color: var(--foreground);
+
+  &:hover:not(:disabled) {
+    background: var(--destructive-bg);
+    border-color: var(--destructive);
+    color: var(--destructive);
+  }
+}

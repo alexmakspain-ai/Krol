@@ -1,7 +1,11 @@
 <div class="expenses-chart">
   <div class="chart-header">
     <h2>{{ 'expensesChart.heading' | translate }}</h2>
-    <button type="button" class="comparison-toggle" (click)="toggleComparison()">
+    <button
+      type="button"
+      class="btn btn--secondary btn--sm"
+      (click)="toggleComparison()"
+    >
       {{
         (comparisonVisible() ? 'expensesChart.hideComparison' : 'expensesChart.showComparison')
           | translate

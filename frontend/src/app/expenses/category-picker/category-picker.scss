@@ -10,11 +10,11 @@
   gap: 0.5rem;
   width: 100%;
   padding: 0.5rem 0.65rem;
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--input);
   border-radius: var(--radius-sm);
-  background: var(--color-surface);
+  background: var(--card);
   font-size: 0.92rem;
-  color: var(--color-text);
+  color: var(--foreground);
   cursor: pointer;
   text-align: left;
   transition:
@@ -22,22 +22,22 @@
     box-shadow 0.15s ease;
 
   &:hover {
-    border-color: var(--color-text-muted);
+    border-color: var(--muted-foreground);
   }
 
   &:focus-visible {
     outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px var(--color-primary-light);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-border);
   }
 
   .placeholder {
-    color: var(--color-text-muted);
+    color: var(--muted-foreground);
   }
 
   .chevron {
     margin-left: auto;
-    color: var(--color-text-muted);
+    color: var(--muted-foreground);
     font-size: 0.7rem;
   }
 }
@@ -50,8 +50,8 @@
   min-width: 240px;
   max-height: 320px;
   overflow-y: auto;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--popover);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   padding: 0.4rem;
@@ -59,7 +59,7 @@
 
 .picker-error {
   margin: 0.25rem 0.4rem;
-  color: var(--color-danger);
+  color: var(--destructive);
   font-size: 0.8rem;
 }
 
@@ -74,7 +74,7 @@
   transition: background 0.12s ease;
 
   &:hover {
-    background: var(--color-bg);
+    background: var(--background);
   }
 
   &.subcategory {
@@ -82,7 +82,7 @@
   }
 
   &.new-root {
-    color: var(--color-primary);
+    color: var(--primary);
     font-weight: 500;
   }
 
@@ -101,20 +101,20 @@
   padding: 0.15rem 0.4rem;
   border-radius: var(--radius-sm);
   font-size: 0.85rem;
-  color: var(--color-text-muted);
+  color: var(--muted-foreground);
   flex-shrink: 0;
   transition:
     background 0.12s ease,
     color 0.12s ease;
 
   &:hover {
-    background: var(--color-border);
-    color: var(--color-text);
+    background: var(--border);
+    color: var(--foreground);
   }
 
   &.delete:hover {
-    background: var(--color-danger-bg);
-    color: var(--color-danger);
+    background: var(--destructive-bg);
+    color: var(--destructive);
   }
 }
 
@@ -145,15 +145,7 @@
     flex: 1;
     min-width: 100px;
     padding: 0.35rem 0.5rem;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-sm);
     font-size: 0.85rem;
-
-    &:focus-visible {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px var(--color-primary-light);
-    }
   }
 
   input[type='color'] {
@@ -161,19 +153,5 @@
     height: 1.9rem;
     width: 2.3rem;
     cursor: pointer;
-  }
-
-  button {
-    padding: 0.3rem 0.6rem;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-sm);
-    background: var(--color-surface);
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: background 0.12s ease;
-
-    &:hover {
-      background: var(--color-bg);
-    }
   }
 }

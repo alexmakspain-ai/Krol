@@ -22,7 +22,7 @@
       <p class="form-error">{{ errorMessage() }}</p>
     }
 
-    <button type="submit" [disabled]="submitting()">
+    <button type="submit" class="btn btn--primary btn--block" [disabled]="submitting()">
       {{
         submitting() ? ('auth.register.submitting' | translate) : ('auth.register.submit' | translate)
       }}

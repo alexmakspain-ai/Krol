@@ -48,7 +48,7 @@
     <p class="form-error">{{ errorMessage() }}</p>
   }
 
-  <button type="submit" [disabled]="submitting()">
+  <button type="submit" class="btn btn--primary" [disabled]="submitting()">
     {{
       submitting() ? ('expenseForm.submitting' | translate) : ('expenseForm.submit' | translate)
     }}

@@ -1,6 +1,6 @@
 .expenses-table {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   box-shadow: var(--shadow-sm);
@@ -18,30 +18,6 @@
 .export-actions {
   display: flex;
   gap: 0.5rem;
-
-  button {
-    padding: 0.4rem 0.85rem;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-sm);
-    background: var(--color-surface);
-    color: var(--color-text);
-    cursor: pointer;
-    font-size: 0.82rem;
-    font-weight: 500;
-    transition:
-      background 0.15s ease,
-      border-color 0.15s ease;
-
-    &:hover:not(:disabled) {
-      background: var(--color-bg);
-      border-color: var(--color-text-muted);
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
 }
 
 table {
@@ -53,23 +29,23 @@ th,
 td {
   padding: 0.7rem 0.6rem;
   text-align: left;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--border);
   font-size: 0.88rem;
 }
 
 th {
   cursor: pointer;
   user-select: none;
-  color: var(--color-text-muted);
+  color: var(--muted-foreground);
   font-weight: 600;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  border-bottom: 1px solid var(--color-border-strong);
+  border-bottom: 1px solid var(--input);
 
   span {
     font-size: 0.7rem;
-    color: var(--color-text-secondary);
+    color: var(--muted-foreground);
   }
 }
 
@@ -77,7 +53,7 @@ tbody tr {
   transition: background 0.12s ease;
 
   &:hover {
-    background: var(--color-bg);
+    background: var(--background);
   }
 }
 
@@ -85,6 +61,11 @@ tbody tr {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+}
+
+.amount {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 .subcategory-header {
@@ -101,11 +82,11 @@ tbody tr {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--color-text-muted);
+  color: var(--muted-foreground);
 }
 
 .subcategory-cell {
-  color: var(--color-text-secondary);
+  color: var(--muted-foreground);
 
   &.collapsed {
     width: 1.5rem;
@@ -118,20 +99,20 @@ tbody tr {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--color-text-muted);
+  background: var(--muted-foreground);
 }
 
 .totals-row {
   font-weight: 600;
-  background: var(--color-bg);
+  background: var(--background);
 
   td {
-    border-top: 1px solid var(--color-border-strong);
+    border-top: 1px solid var(--input);
     border-bottom: none;
   }
 
   &.grand-total {
-    border-top: 2px solid var(--color-text-muted);
+    border-top: 2px solid var(--muted-foreground);
     font-size: 0.95rem;
   }
 }
@@ -147,47 +128,15 @@ tbody tr {
 .actions {
   display: flex;
   gap: 0.5rem;
-
-  button {
-    padding: 0.35rem 0.7rem;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-sm);
-    background: var(--color-surface);
-    color: var(--color-text);
-    cursor: pointer;
-    font-size: 0.78rem;
-    transition:
-      background 0.15s ease,
-      border-color 0.15s ease,
-      color 0.15s ease;
-
-    &:hover {
-      background: var(--color-bg);
-      border-color: var(--color-text-muted);
-    }
-
-    &.danger:hover {
-      background: var(--color-danger-bg);
-      border-color: var(--color-danger);
-      color: var(--color-danger);
-    }
-  }
 }
 
 .editing input,
 .editing select {
   padding: 0.35rem 0.5rem;
-  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
   width: 100%;
   box-sizing: border-box;
   font-size: 0.85rem;
-
-  &:focus-visible {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px var(--color-primary-light);
-  }
 }
 
 .pagination {
@@ -196,32 +145,14 @@ tbody tr {
   gap: 1rem;
   margin-top: 1.25rem;
   font-size: 0.85rem;
-  color: var(--color-text-secondary);
+  color: var(--muted-foreground);
 
-  button {
-    padding: 0.4rem 0.9rem;
-    border: 1px solid var(--color-border-strong);
+  .btn {
     border-radius: var(--radius-pill);
-    background: var(--color-surface);
-    color: var(--color-text);
-    cursor: pointer;
-    transition:
-      background 0.15s ease,
-      border-color 0.15s ease;
-
-    &:hover:not(:disabled) {
-      background: var(--color-bg);
-      border-color: var(--color-text-muted);
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
   }
 }
 
 .form-error {
-  color: var(--color-danger);
+  color: var(--destructive);
   font-size: 0.85rem;
 }

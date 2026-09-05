@@ -10,10 +10,20 @@
     />
 
     <div class="export-actions">
-      <button type="button" [disabled]="exporting()" (click)="exportCsv()">
+      <button
+        type="button"
+        class="btn btn--secondary btn--sm"
+        [disabled]="exporting()"
+        (click)="exportCsv()"
+      >
         {{ 'expensesTable.exportCsv' | translate }}
       </button>
-      <button type="button" [disabled]="exporting()" (click)="exportXlsx()">
+      <button
+        type="button"
+        class="btn btn--secondary btn--sm"
+        [disabled]="exporting()"
+        (click)="exportXlsx()"
+      >
         {{ 'expensesTable.exportXlsx' | translate }}
       </button>
     </div>
@@ -101,10 +111,10 @@
                 <input type="date" [ngModel]="editDate()" (ngModelChange)="editDate.set($event)" />
               </td>
               <td class="actions">
-                <button type="button" (click)="saveEdit(expense)">
+                <button type="button" class="btn btn--primary btn--sm" (click)="saveEdit(expense)">
                   {{ 'expensesTable.save' | translate }}
                 </button>
-                <button type="button" (click)="cancelEdit()">
+                <button type="button" class="btn btn--secondary btn--sm" (click)="cancelEdit()">
                   {{ 'expensesTable.cancel' | translate }}
                 </button>
               </td>
@@ -125,13 +135,17 @@
                   <span class="subcat-dot" [title]="subcategoryLabelOf(expense)"></span>
                 }
               </td>
-              <td>{{ expense.amount | number: '1.2-2' }}</td>
+              <td class="amount">{{ expense.amount | number: '1.2-2' }}</td>
               <td>{{ expense.date }}</td>
               <td class="actions">
-                <button type="button" (click)="startEdit(expense)">
+                <button type="button" class="btn btn--secondary btn--sm" (click)="startEdit(expense)">
                   {{ 'expensesTable.edit' | translate }}
                 </button>
-                <button type="button" class="danger" (click)="deleteExpense(expense)">
+                <button
+                  type="button"
+                  class="btn btn--destructive btn--sm"
+                  (click)="deleteExpense(expense)"
+                >
                   {{ 'expensesTable.delete' | translate }}
                 </button>
               </td>
@@ -150,13 +164,13 @@
                 {{ total.name }}
               </span>
             </td>
-            <td>{{ total.total | number: '1.2-2' }}</td>
+            <td class="amount">{{ total.total | number: '1.2-2' }}</td>
             <td colspan="2"></td>
           </tr>
         }
         <tr class="totals-row grand-total">
           <td colspan="3">{{ 'expensesTable.total' | translate }}</td>
-          <td>{{ grandTotal() | number: '1.2-2' }}</td>
+          <td class="amount">{{ grandTotal() | number: '1.2-2' }}</td>
           <td colspan="2"></td>
         </tr>
       </tfoot>
@@ -164,11 +178,21 @@
   </table>
 
   <div class="pagination">
-    <button type="button" [disabled]="page() === 0" (click)="prevPage()">
+    <button
+      type="button"
+      class="btn btn--secondary btn--sm"
+      [disabled]="page() === 0"
+      (click)="prevPage()"
+    >
       {{ 'expensesTable.prevPage' | translate }}
     </button>
     <span>{{ 'expensesTable.page' | translate: { n: page() + 1 } }}</span>
-    <button type="button" [disabled]="!hasNextPage()" (click)="nextPage()">
+    <button
+      type="button"
+      class="btn btn--secondary btn--sm"
+      [disabled]="!hasNextPage()"
+      (click)="nextPage()"
+    >
       {{ 'expensesTable.nextPage' | translate }}
     </button>
   </div>

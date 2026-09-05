@@ -1,25 +1,55 @@
+@use 'styles/primitives';
+
 :root {
-  --color-primary: #4f46e5;
-  --color-primary-hover: #4338ca;
-  --color-primary-light: #eef2ff;
-  --color-primary-border: #c7d2fe;
+  /* Brand colors converted from hex to oklch via sRGB -> OKLab, not eyeballed
+     (indigo primary preserved from the original palette; everything else
+     follows the shadcn/ui semantic token contract: background/foreground,
+     card, primary, secondary, muted, accent, destructive, border/input/ring). */
+  --background: oklch(0.977 0.005 274.967);
+  --foreground: oklch(0.209 0.01 268.187);
 
-  --color-bg: #f6f7fb;
-  --color-surface: #ffffff;
-  --color-border: #e3e5ea;
-  --color-border-strong: #d1d5db;
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
 
-  --color-text: #16181d;
-  --color-text-secondary: #5b5f6b;
-  --color-text-muted: #6f7380;
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
 
-  --color-danger: #dc2626;
-  --color-danger-hover: #b91c1c;
-  --color-danger-bg: #fef2f2;
+  --primary: oklch(0.511 0.23 276.966);
+  --primary-foreground: oklch(1 0 0);
+  --primary-hover: oklch(0.457 0.215 277.023);
+  --primary-border: oklch(0.87 0.062 274.039);
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --secondary: oklch(0.95 0.006 274.967);
+  --secondary-foreground: var(--foreground);
+
+  --muted: var(--secondary);
+  --muted-foreground: oklch(0.486 0.02 270.985);
+
+  --accent: oklch(0.962 0.018 272.314);
+  --accent-foreground: var(--foreground);
+
+  --destructive: oklch(0.577 0.215 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --destructive-hover: oklch(0.505 0.19 27.518);
+  --destructive-bg: oklch(0.971 0.013 17.38);
+
+  --border: oklch(0.922 0.007 268.545);
+  --input: oklch(0.872 0.009 258.338);
+  --ring: var(--primary);
+
+  /* Categorical palette for charts (shadcn's default chart-1..5 set) */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+
+  /* Radius scale derived from a single base, shadcn-style */
+  --radius: 0.625rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
   --radius-pill: 999px;
 
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
@@ -27,6 +57,8 @@
   --shadow-lg: 0 20px 45px rgba(16, 24, 40, 0.14);
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: 'Lora', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 }
 
 * {
@@ -40,8 +72,8 @@ body {
 
 body {
   margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
+  background: var(--background);
+  color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.5;
@@ -54,6 +86,7 @@ h2,
 h3,
 h4 {
   margin: 0;
+  font-family: var(--font-heading);
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.01em;
@@ -64,5 +97,24 @@ button {
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--primary);
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--foreground);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-border);
+  }
 }

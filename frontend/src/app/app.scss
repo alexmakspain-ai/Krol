@@ -4,8 +4,8 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem 1.75rem;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
@@ -13,10 +13,11 @@
 }
 
 .app-title {
+  font-family: var(--font-heading);
   font-weight: 700;
   font-size: 1.15rem;
   letter-spacing: -0.01em;
-  color: var(--color-text);
+  color: var(--foreground);
 }
 
 .header-actions {
@@ -30,23 +31,5 @@
   align-items: center;
   gap: 0.75rem;
   font-size: 0.85rem;
-  color: var(--color-text-secondary);
-
-  button {
-    padding: 0.4rem 0.9rem;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-sm);
-    background: var(--color-surface);
-    color: var(--color-text);
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition:
-      background 0.15s ease,
-      border-color 0.15s ease;
-
-    &:hover {
-      background: var(--color-bg);
-      border-color: var(--color-text-muted);
-    }
-  }
+  color: var(--muted-foreground);
 }

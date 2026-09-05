@@ -46,10 +46,10 @@
               (ngModelChange)="newName.set($event)"
             />
             <input type="color" [ngModel]="newColor()" (ngModelChange)="newColor.set($event)" />
-            <button type="button" (click)="confirmCreate()">
+            <button type="button" class="btn btn--primary btn--sm" (click)="confirmCreate()">
               {{ 'categoryPicker.add' | translate }}
             </button>
-            <button type="button" (click)="cancelCreate()">
+            <button type="button" class="btn btn--secondary btn--sm" (click)="cancelCreate()">
               {{ 'categoryPicker.cancel' | translate }}
             </button>
           </div>
@@ -80,10 +80,10 @@
             (ngModelChange)="newName.set($event)"
           />
           <input type="color" [ngModel]="newColor()" (ngModelChange)="newColor.set($event)" />
-          <button type="button" (click)="confirmCreate()">
+          <button type="button" class="btn btn--primary btn--sm" (click)="confirmCreate()">
             {{ 'categoryPicker.add' | translate }}
           </button>
-          <button type="button" (click)="cancelCreate()">
+          <button type="button" class="btn btn--secondary btn--sm" (click)="cancelCreate()">
             {{ 'categoryPicker.cancel' | translate }}
           </button>
         </div>

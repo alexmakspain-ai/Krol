@@ -7,7 +7,9 @@
     @if (authService.isAuthenticated()) {
       <div class="user-info">
         <span>{{ authService.currentUserEmail() }}</span>
-        <button type="button" (click)="logout()">{{ 'app.logout' | translate }}</button>
+        <button type="button" class="btn btn--secondary btn--sm" (click)="logout()">
+          {{ 'app.logout' | translate }}
+        </button>
       </div>
     }
   </div>

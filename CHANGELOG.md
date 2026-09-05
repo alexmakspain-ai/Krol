@@ -565,3 +565,114 @@ Backend не менялся.
 - `frontend/src/app/expenses/expenses-page/expenses-page.html` — обёртка
   `<div id="expenses-table-section">` вокруг `<app-expenses-table>` —
   якорь для прокрутки из «Go to category»
+
+## Доработка №3 — редизайн фронтенда (единая визуальная система)
+
+Внеплановый запрос, не привязан к нумерации этапов ТЗ. Backend не менялся.
+
+### Дизайн-токены и шрифт
+
+**Изменено:**
+- `frontend/src/styles.scss` — был пустой заглушкой CLI; теперь содержит
+  CSS custom properties (`--color-*`, `--radius-*`, `--shadow-*`,
+  `--font-sans`) и базовые глобальные стили (`body`, заголовки, `button`,
+  `a`)
+- `frontend/src/index.html` — добавлены `preconnect` на
+  `fonts.googleapis.com`/`fonts.gstatic.com` и `<link>` на шрифт Inter
+  (400/500/600/700, с кириллицей)
+
+### Стили компонентов (переведены на общие токены)
+
+**Изменено:**
+- `frontend/src/app/app.scss`
+- `frontend/src/app/auth/login/login.scss`, `frontend/src/app/auth/register/register.scss`
+- `frontend/src/app/charts/expenses-chart/expenses-chart.scss`,
+  `frontend/src/app/charts/single-expenses-chart/single-expenses-chart.scss`
+- `frontend/src/app/expenses/category-picker/category-picker.scss`
+- `frontend/src/app/expenses/expense-form/expense-form.scss`
+- `frontend/src/app/expenses/expenses-page/expenses-page.scss`
+- `frontend/src/app/expenses/expenses-table/expenses-table.scss` — заодно
+  исправлен контраст `text-muted` в заголовке таблицы (не проходил WCAG AA)
+- `frontend/src/app/shared/language-switcher/language-switcher.scss`
+- `frontend/src/app/shared/period-filter/period-filter.scss`
+
+### Мелкие точечные правки
+
+**Изменено:**
+- `frontend/src/app/charts/single-expenses-chart/single-expenses-chart.ts`
+  — добавлена конфигурация `tooltip` в `ChartConfiguration` (тёмный фон,
+  скруглённые углы, шрифт Inter вместо дефолтного вида Chart.js)
+- `frontend/src/app/expenses/expenses-table/expenses-table.html` — кнопка
+  «Удалить» получила класс `danger` (отдельный hover-стиль от Edit/Save/Cancel)
+
+**Не менялось:** структура шаблонов, роутинг, бизнес-логика — правки чисто
+визуальные, кроме добавления класса `danger`.
+
+## Доработка №4 — скилл frontend-design + фундамент дизайн-системы (shadcn-контракт)
+
+Внеплановый запрос, не привязан к нумерации этапов ТЗ. Backend не менялся.
+
+### Скилл
+
+**Создано:**
+- `.agents/skills/frontend-design/` — установлен через `npx skills add
+  anthropics/skills --skill frontend-design`
+- `.claude/skills/frontend-design` — симлинк на него (Claude Code)
+- `skills-lock.json` — лок-файл менеджера `skills`
+
+### Токены (shadcn-контракт)
+
+**Изменено:**
+- `frontend/src/styles.scss` — блок `:root` переписан: `--color-*` заменены
+  на семантические имена shadcn (`--background`/`--foreground`, `--card`,
+  `--popover`, `--primary`, `--secondary` (новое), `--muted`, `--accent`,
+  `--destructive`, `--border`, `--input`, `--ring` (новое)), добавлены
+  `--chart-1`…`--chart-5`; радиусы (`--radius-sm/md/lg/xl`) выведены из
+  одного базового `--radius: 0.625rem` по формуле shadcn; добавлены
+  `--font-heading` (Lora) и `--font-mono` (JetBrains Mono); добавлены
+  глобальные селекторы `input, select, textarea` (рамка/фокус-кольцо один
+  раз для всего приложения); подключён `@use 'styles/primitives'`
+- `frontend/src/index.html` — `<link>` на шрифты дополнен Lora
+  (500/600/700) и JetBrains Mono (400/500) в одном запросе к Google Fonts
+  вместе с уже подключённым Inter
+
+**Создано:**
+- `frontend/src/styles/_primitives.scss` — `.btn` + модификаторы
+  `--primary`/`--secondary`/`--ghost`/`--destructive`/`--sm`/`--block`
+
+### Миграция компонентов на новые токены/примитивы
+
+Во всех 11 файлах `.scss` — механическая замена `var(--color-*)` на новые
+имена (см. таблицу соответствий в плане; кратко: `--color-surface`→`--card`,
+`--color-border-strong`→`--input`, `--color-primary-light`→`--accent`,
+`--color-danger*`→`--destructive*`, `--color-text-secondary`/
+`--color-text-muted`→`--muted-foreground`) и удаление теперь избыточных
+объявлений `border`/`background`/`:focus-visible` для инпутов/кнопок,
+покрытых глобальными правилами:
+
+**Изменено (`.scss`):** `app.scss`, `auth/login/login.scss`,
+`auth/register/register.scss`, `charts/expenses-chart/expenses-chart.scss`,
+`charts/single-expenses-chart/single-expenses-chart.scss` (плюс
+`.info-amount`/`.breakdown-amount` получили `font-family: var(--font-mono)`
++ `font-variant-numeric: tabular-nums`), `expenses/category-picker/category-picker.scss`,
+`expenses/expense-form/expense-form.scss`,
+`expenses/expenses-table/expenses-table.scss` (плюс новый класс `.amount`
+с моно-шрифтом на суммах в строках/итогах, замена `.danger` на
+`.btn--destructive`), `shared/language-switcher/language-switcher.scss`,
+`shared/period-filter/period-filter.scss` (эти два — намеренно не мигрированы
+на `.btn`, это segmented-control, а не кнопка)
+
+**Изменено (`.html`, добавлены классы `.btn .btn--*`):** `app.html`
+(logout), `auth/login/login.html`, `auth/register/register.html`
+(submit → `.btn--primary.btn--block`), `expenses/expense-form/expense-form.html`
+(submit → `.btn--primary`), `expenses/expenses-table/expenses-table.html`
+(export CSV/XLSX, Save/Cancel/Edit/Delete, пагинация — плюс класс `.amount`
+на три `<td>` с суммами), `expenses/category-picker/category-picker.html`
+(Add/Cancel в обоих местах создания категории/подкатегории),
+`charts/expenses-chart/expenses-chart.html` (comparison-toggle),
+`charts/single-expenses-chart/single-expenses-chart.html` (go-to-category)
+
+### Корень репозитория
+
+**Изменено:**
+- `PROGRESS.md`, `CHANGELOG.md` — добавлена запись «Доработка №4»
