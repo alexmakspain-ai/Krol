@@ -703,6 +703,49 @@ input/button, теперь заданные один раз глобально �
   структурированы так, что это вопрос одного нового блока
 - Вынос фронтенда на Vercel — отдельная тема, не входила в эту доработку
 
+## Доработка №5 — конфигурация сборки фронтенда для Vercel
+
+Внеплановый запрос: сравнение с https://papeles-ai.vercel.app показало,
+что их фронтенд открывается мгновенно (статика на CDN), а наш — единый
+Docker-сервис на Render (free-план), который засыпает после простоя.
+Решили разделить хостинг: фронтенд → Vercel, backend+Postgres — остаются
+на Render как есть (не трогаем тариф/архитектуру). Не привязана к
+нумерации этапов ТЗ.
+
+**Статус:** конфигурация сборки готова и запушена; сам деплой на
+vercel.com и синхронизация `CORS_ORIGINS` на Render — ждут пользователя
+(нужен реальный домен, который выдаст Vercel после подключения репозитория).
+
+**Сделано:**
+- `frontend/src/environments/environment.vercel.ts` — новый файл,
+  `apiBaseUrl` абсолютный (`https://krol.onrender.com/api`), в отличие от
+  относительного `/api` в `environment.prod.ts` (тот работает только пока
+  фронтенд и API на одном origin — как сейчас на Render)
+- `frontend/angular.json` — новая конфигурация сборки `vercel` (по образцу
+  `production`), с `fileReplacements` на `environment.vercel.ts`
+- `frontend/vercel.json` — новый файл: `buildCommand` (`ng build
+  --configuration vercel`), `outputDirectory` (`dist/frontend/browser`,
+  та же папка, что использует `Dockerfile`), SPA-рерайт всех путей на
+  `/index.html` (роутинг Angular путевой, не hash-based)
+- Существующая конфигурация `production` и `Dockerfile` не тронуты —
+  комбинированный деплой на Render продолжает работать как раньше
+
+**Проверено:**
+- `ng build --configuration production` и `ng build --configuration
+  vercel` — обе без ошибок
+- В собранном vercel-бандле (`dist/frontend/browser/main-*.js`)
+  подтверждено грепом, что `apiBaseUrl` — абсолютный URL, а не `/api`
+- `ng test` — 2/2 теста проходят (правки не затрагивают компоненты)
+
+**Не сделано (следующий шаг, нужен пользователь):**
+- Backend не меняли — `CORS_ORIGINS` в `render.yaml` ещё не добавлен,
+  т.к. точный домен Vercel появится только после первого деплоя туда
+- Сам деплой на vercel.com (подключение репозитория, Root Directory =
+  `frontend`) — не выполнялся в этой сессии
+- После деплоя на Vercel и получения домена: вписать его в
+  `CORS_ORIGINS`, закоммитить, синхронизировать Blueprint на Render,
+  проверить в DevTools Network, что запросы к API проходят без CORS-ошибок
+
 ## Этап 7 — Полировка UI, тестирование сценариев
 
 **Статус:** не начат.

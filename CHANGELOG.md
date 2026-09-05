@@ -676,3 +676,24 @@ Backend не менялся.
 
 **Изменено:**
 - `PROGRESS.md`, `CHANGELOG.md` — добавлена запись «Доработка №4»
+
+## Доработка №5 — конфигурация сборки фронтенда для Vercel
+
+Внеплановый запрос, не привязан к нумерации этапов ТЗ. Backend не менялся
+(только запланирован один env var — см. «Не сделано» в PROGRESS.md).
+
+### Frontend
+
+**Создано:**
+- `frontend/src/environments/environment.vercel.ts` — `apiBaseUrl`
+  абсолютный (`https://krol.onrender.com/api`), в отличие от
+  относительного `/api` в `environment.prod.ts`
+- `frontend/vercel.json` — `buildCommand` (`ng build --configuration
+  vercel`), `outputDirectory` (`dist/frontend/browser`), SPA-рерайт всех
+  путей на `/index.html`
+
+**Изменено:**
+- `frontend/angular.json` — добавлена конфигурация сборки `vercel`
+  (`projects.frontend.architect.build.configurations.vercel`), по образцу
+  `production`, с `fileReplacements` на `environment.vercel.ts`;
+  существующая `production` (используется `Dockerfile`) не тронута
